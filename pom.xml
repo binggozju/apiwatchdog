@@ -1,0 +1,127 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.binggo</groupId>
+  <artifactId>apiwatchdog</artifactId>
+  <version>0.1.0</version>
+  <packaging>jar</packaging>
+
+  <name>apiwatchdog</name>
+  <description>A common service used to monitor all api and send alarm messages in real time</description>
+
+  <parent>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-parent</artifactId>
+	<version>1.3.6.RELEASE</version>
+	<relativePath/>
+  </parent>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>1.8</java.version>
+    <zookeeper.version>3.4.6</zookeeper.version>
+    <kafka.version>0.8.1.1</kafka.version>
+  </properties>
+
+  <dependencies>
+  	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter</artifactId>
+	</dependency>
+		
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    
+    <!-- kafka -->
+    <dependency>
+    	<groupId>org.apache.kafka</groupId>
+        <artifactId>kafka_2.10</artifactId>
+        <version>${kafka.version}</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.apache.zookeeper</groupId>
+        <artifactId>zookeeper</artifactId>
+        <version>${zookeeper.version}</version>
+    </dependency>
+
+  	<!-- mysql and mybatis -->
+  	<dependency>
+    	<groupId>mysql</groupId>
+    	<artifactId>mysql-connector-java</artifactId>
+    </dependency>
+	<dependency>
+		<groupId>org.mybatis.spring.boot</groupId>
+		<artifactId>mybatis-spring-boot-starter</artifactId>
+		<version>1.1.1</version>
+	</dependency>
+	
+	<!-- utility package -->
+	<dependency>
+    	<groupId>org.apache.httpcomponents</groupId>
+    	<artifactId>httpclient</artifactId>
+    </dependency>
+    
+    <dependency>
+    	<groupId>com.google.code.gson</groupId>
+    	<artifactId>gson</artifactId>
+    </dependency>
+	
+	<!-- test -->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-test</artifactId>
+		<scope>test</scope>
+	</dependency>
+  
+  </dependencies>
+  
+  <build>
+  	<finalName>apiwatchdog</finalName>
+  	
+  	<plugins>
+  		<plugin>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-maven-plugin</artifactId>
+			<configuration>
+				<executable>true</executable>
+			</configuration>
+		</plugin>
+		
+		<!-- mybatis generator plugin -->
+		<plugin>
+    		<groupId>org.mybatis.generator</groupId>
+    		<artifactId>mybatis-generator-maven-plugin</artifactId>
+    		<version>1.3.2</version>
+    		<configuration>
+        		<configurationFile>config/generatorConfig.xml</configurationFile>
+        		<verbose>true</verbose>
+        		<overwrite>true</overwrite>
+    		</configuration>
+    		<dependencies>
+        		<dependency>
+            		<groupId>org.mybatis.generator</groupId>
+            		<artifactId>mybatis-generator-core</artifactId>
+            		<version>1.3.2</version>
+        		</dependency>
+        		<dependency>
+                     <groupId>mysql</groupId>
+                     <artifactId>mysql-connector-java</artifactId>
+                     <version>5.1.38</version>
+                </dependency>
+                <dependency>
+                     <groupId>org.mybatis</groupId>
+                     <artifactId>mybatis</artifactId>
+                     <version>3.2.8</version>
+                </dependency>
+    		</dependencies>
+		</plugin>
+		
+  	</plugins>
+  	
+  </build>
+  
+</project>
