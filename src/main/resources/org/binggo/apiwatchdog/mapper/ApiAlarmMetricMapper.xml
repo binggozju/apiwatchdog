@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.binggo.apiwatchdog.mapper.ApiAlarmMetricMapper" >
+  <resultMap id="ApiAlarmMetricResultMap" type="org.binggo.apiwatchdog.domain.ApiAlarmMetric" >
+    <result column="api_id" property="apiId" jdbcType="INTEGER" />
+    <result column="metric_not200" property="metricNot200" jdbcType="TINYINT" />
+    <result column="metric_200_not0" property="metric200Not0" jdbcType="TINYINT" />
+    <result column="metric_resptime_threshold" property="metricResptimeThreshold" jdbcType="TINYINT" />
+    <result column="alarm_type" property="alarmType" jdbcType="TINYINT" />
+  </resultMap>
+  
+  <insert id="insert" parameterType="org.binggo.apiwatchdog.domain.ApiAlarmMetric" >
+    insert into api_alarm_metric (api_id, metric_not200, metric_200_not0, 
+      metric_resptime_threshold, alarm_type)
+    values (#{apiId,jdbcType=INTEGER}, #{metricNot200,jdbcType=TINYINT}, #{metric200Not0,jdbcType=TINYINT}, 
+      #{metricResptimeThreshold,jdbcType=TINYINT}, #{alarmType,jdbcType=TINYINT})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="org.binggo.apiwatchdog.domain.ApiAlarmMetric" >
+    insert into api_alarm_metric
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="apiId != null" >
+        api_id,
+      </if>
+      <if test="metricNot200 != null" >
+        metric_not200,
+      </if>
+      <if test="metric200Not0 != null" >
+        metric_200_not0,
+      </if>
+      <if test="metricResptimeThreshold != null" >
+        metric_resptime_threshold,
+      </if>
+      <if test="alarmType != null" >
+        alarm_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="apiId != null" >
+        #{apiId,jdbcType=INTEGER},
+      </if>
+      <if test="metricNot200 != null" >
+        #{metricNot200,jdbcType=TINYINT},
+      </if>
+      <if test="metric200Not0 != null" >
+        #{metric200Not0,jdbcType=TINYINT},
+      </if>
+      <if test="metricResptimeThreshold != null" >
+        #{metricResptimeThreshold,jdbcType=TINYINT},
+      </if>
+      <if test="alarmType != null" >
+        #{alarmType,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  
+</mapper>

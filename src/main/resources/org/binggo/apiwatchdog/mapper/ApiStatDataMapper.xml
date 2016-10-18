@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.binggo.apiwatchdog.mapper.ApiStatDataMapper" >
+  <resultMap id="ApiStatDataResultMap" type="org.binggo.apiwatchdog.domain.ApiStatData" >
+    <result column="api_id" property="apiId" jdbcType="INTEGER" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="count_total" property="countTotal" jdbcType="INTEGER" />
+    <result column="count_timeout" property="countTimeout" jdbcType="INTEGER" />
+    <result column="count_not200" property="countNot200" jdbcType="INTEGER" />
+    <result column="count_200_not0" property="count200Not0" jdbcType="INTEGER" />
+    <result column="resptime_average" property="resptimeAverage" jdbcType="DOUBLE" />
+    <result column="resptime_0s_1s" property="resptime0s1s" jdbcType="INTEGER" />
+    <result column="resptime_1s_2s" property="resptime1s2s" jdbcType="INTEGER" />
+    <result column="resptime_2s_3s" property="resptime2s3s" jdbcType="INTEGER" />
+    <result column="resptime_3s_4s" property="resptime3s4s" jdbcType="INTEGER" />
+    <result column="resptime_4s_5s" property="resptime4s5s" jdbcType="INTEGER" />
+    <result column="resptime_5s_6s" property="resptime5s6s" jdbcType="INTEGER" />
+    <result column="resptime_6s_7s" property="resptime6s7s" jdbcType="INTEGER" />
+    <result column="resptime_7s_8s" property="resptime7s8s" jdbcType="INTEGER" />
+    <result column="resptime_8s_9s" property="resptime8s9s" jdbcType="INTEGER" />
+    <result column="resptime_10s_11s" property="resptime10s11s" jdbcType="INTEGER" />
+    <result column="resptime_11s_12s" property="resptime11s12s" jdbcType="INTEGER" />
+    <result column="resptime_12s_max" property="resptime12sMax" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <insert id="insert" parameterType="org.binggo.apiwatchdog.domain.ApiStatData" >
+    insert into api_stat_data (api_id, start_time, count_total, 
+      count_timeout, count_not200, count_200_not0, 
+      resptime_average, resptime_0s_1s, resptime_1s_2s, 
+      resptime_2s_3s, resptime_3s_4s, resptime_4s_5s, 
+      resptime_5s_6s, resptime_6s_7s, resptime_7s_8s, 
+      resptime_8s_9s, resptime_10s_11s, resptime_11s_12s, 
+      resptime_12s_max)
+    values (#{apiId,jdbcType=INTEGER}, #{startTime,jdbcType=TIMESTAMP}, #{countTotal,jdbcType=INTEGER}, 
+      #{countTimeout,jdbcType=INTEGER}, #{countNot200,jdbcType=INTEGER}, #{count200Not0,jdbcType=INTEGER}, 
+      #{resptimeAverage,jdbcType=DOUBLE}, #{resptime0s1s,jdbcType=INTEGER}, #{resptime1s2s,jdbcType=INTEGER}, 
+      #{resptime2s3s,jdbcType=INTEGER}, #{resptime3s4s,jdbcType=INTEGER}, #{resptime4s5s,jdbcType=INTEGER}, 
+      #{resptime5s6s,jdbcType=INTEGER}, #{resptime6s7s,jdbcType=INTEGER}, #{resptime7s8s,jdbcType=INTEGER}, 
+      #{resptime8s9s,jdbcType=INTEGER}, #{resptime10s11s,jdbcType=INTEGER}, #{resptime11s12s,jdbcType=INTEGER}, 
+      #{resptime12sMax,jdbcType=INTEGER})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="org.binggo.apiwatchdog.domain.ApiStatData" >
+    insert into api_stat_data
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="apiId != null" >
+        api_id,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="countTotal != null" >
+        count_total,
+      </if>
+      <if test="countTimeout != null" >
+        count_timeout,
+      </if>
+      <if test="countNot200 != null" >
+        count_not200,
+      </if>
+      <if test="count200Not0 != null" >
+        count_200_not0,
+      </if>
+      <if test="resptimeAverage != null" >
+        resptime_average,
+      </if>
+      <if test="resptime0s1s != null" >
+        resptime_0s_1s,
+      </if>
+      <if test="resptime1s2s != null" >
+        resptime_1s_2s,
+      </if>
+      <if test="resptime2s3s != null" >
+        resptime_2s_3s,
+      </if>
+      <if test="resptime3s4s != null" >
+        resptime_3s_4s,
+      </if>
+      <if test="resptime4s5s != null" >
+        resptime_4s_5s,
+      </if>
+      <if test="resptime5s6s != null" >
+        resptime_5s_6s,
+      </if>
+      <if test="resptime6s7s != null" >
+        resptime_6s_7s,
+      </if>
+      <if test="resptime7s8s != null" >
+        resptime_7s_8s,
+      </if>
+      <if test="resptime8s9s != null" >
+        resptime_8s_9s,
+      </if>
+      <if test="resptime10s11s != null" >
+        resptime_10s_11s,
+      </if>
+      <if test="resptime11s12s != null" >
+        resptime_11s_12s,
+      </if>
+      <if test="resptime12sMax != null" >
+        resptime_12s_max,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="apiId != null" >
+        #{apiId,jdbcType=INTEGER},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="countTotal != null" >
+        #{countTotal,jdbcType=INTEGER},
+      </if>
+      <if test="countTimeout != null" >
+        #{countTimeout,jdbcType=INTEGER},
+      </if>
+      <if test="countNot200 != null" >
+        #{countNot200,jdbcType=INTEGER},
+      </if>
+      <if test="count200Not0 != null" >
+        #{count200Not0,jdbcType=INTEGER},
+      </if>
+      <if test="resptimeAverage != null" >
+        #{resptimeAverage,jdbcType=DOUBLE},
+      </if>
+      <if test="resptime0s1s != null" >
+        #{resptime0s1s,jdbcType=INTEGER},
+      </if>
+      <if test="resptime1s2s != null" >
+        #{resptime1s2s,jdbcType=INTEGER},
+      </if>
+      <if test="resptime2s3s != null" >
+        #{resptime2s3s,jdbcType=INTEGER},
+      </if>
+      <if test="resptime3s4s != null" >
+        #{resptime3s4s,jdbcType=INTEGER},
+      </if>
+      <if test="resptime4s5s != null" >
+        #{resptime4s5s,jdbcType=INTEGER},
+      </if>
+      <if test="resptime5s6s != null" >
+        #{resptime5s6s,jdbcType=INTEGER},
+      </if>
+      <if test="resptime6s7s != null" >
+        #{resptime6s7s,jdbcType=INTEGER},
+      </if>
+      <if test="resptime7s8s != null" >
+        #{resptime7s8s,jdbcType=INTEGER},
+      </if>
+      <if test="resptime8s9s != null" >
+        #{resptime8s9s,jdbcType=INTEGER},
+      </if>
+      <if test="resptime10s11s != null" >
+        #{resptime10s11s,jdbcType=INTEGER},
+      </if>
+      <if test="resptime11s12s != null" >
+        #{resptime11s12s,jdbcType=INTEGER},
+      </if>
+      <if test="resptime12sMax != null" >
+        #{resptime12sMax,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+</mapper>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.binggo.apiwatchdog.mapper.ApiItemMapper" >
+  <resultMap id="ApiItemResultMap" type="org.binggo.apiwatchdog.domain.ApiItem" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="path" property="path" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="VARCHAR" />
+    <result column="service_id" property="serviceId" jdbcType="INTEGER" />
+    <result column="state" property="state" jdbcType="TINYINT" />
+  </resultMap>
+  
+  <resultMap id="ResultMapWithBLOBs" type="org.binggo.apiwatchdog.domain.ApiItem" extends="BaseResultMap" >
+    <result column="description" property="description" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, name, path, type, version, service_id, state
+  </sql>
+  <sql id="Blob_Column_List" >
+    description
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from api_item
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from api_item
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="insert" parameterType="org.binggo.apiwatchdog.domain.ApiItem" >
+    insert into api_item (id, name, path, 
+      type, version, service_id, 
+      state, description)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{path,jdbcType=VARCHAR}, 
+      #{type,jdbcType=VARCHAR}, #{version,jdbcType=VARCHAR}, #{serviceId,jdbcType=INTEGER}, 
+      #{state,jdbcType=TINYINT}, #{description,jdbcType=LONGVARCHAR})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="org.binggo.apiwatchdog.domain.ApiItem" >
+    insert into api_item
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="path != null" >
+        path,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="version != null" >
+        version,
+      </if>
+      <if test="serviceId != null" >
+        service_id,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="path != null" >
+        #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceId != null" >
+        #{serviceId,jdbcType=INTEGER},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=TINYINT},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="org.binggo.apiwatchdog.domain.ApiItem" >
+    update api_item
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="path != null" >
+        path = #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceId != null" >
+        service_id = #{serviceId,jdbcType=INTEGER},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=TINYINT},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="org.binggo.apiwatchdog.domain.ApiItem" >
+    update api_item
+    set name = #{name,jdbcType=VARCHAR},
+      path = #{path,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
+      version = #{version,jdbcType=VARCHAR},
+      service_id = #{serviceId,jdbcType=INTEGER},
+      state = #{state,jdbcType=TINYINT},
+      description = #{description,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.binggo.apiwatchdog.domain.ApiItem" >
+    update api_item
+    set name = #{name,jdbcType=VARCHAR},
+      path = #{path,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
+      version = #{version,jdbcType=VARCHAR},
+      service_id = #{serviceId,jdbcType=INTEGER},
+      state = #{state,jdbcType=TINYINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

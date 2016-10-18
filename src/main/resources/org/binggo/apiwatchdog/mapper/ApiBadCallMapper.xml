@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.binggo.apiwatchdog.mapper.ApiBadCallMapper" >
+  <resultMap id="ApiBadCallResultMap" type="org.binggo.apiwatchdog.domain.ApiBadCall" >
+    <result column="api_id" property="apiId" jdbcType="INTEGER" />
+    <result column="request_time" property="requestTime" jdbcType="TIMESTAMP" />
+    <result column="response_time" property="responseTime" jdbcType="TIMESTAMP" />
+    <result column="http_reponse_code" property="httpReponseCode" jdbcType="VARCHAR" />
+    <result column="api_return_code" property="apiReturnCode" jdbcType="VARCHAR" />
+    <result column="api_return_message" property="apiReturnMessage" jdbcType="VARCHAR" />
+    <result column="source_service" property="sourceService" jdbcType="VARCHAR" />
+    <result column="source_host" property="sourceHost" jdbcType="VARCHAR" />
+    <result column="dest_service" property="destService" jdbcType="VARCHAR" />
+    <result column="dest_host" property="destHost" jdbcType="VARCHAR" />
+    <result column="request_body" property="requestBody" jdbcType="VARCHAR" />
+    <result column="response_body" property="responseBody" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="ResultMapWithBLOBs" type="org.binggo.apiwatchdog.domain.ApiBadCall" extends="BaseResultMap" >
+    <result column="call_uuid" property="callUuid" jdbcType="VARBINARY" />
+  </resultMap>
+  
+  <sql id="Blob_Column_List" >
+    call_uuid
+  </sql>
+  <insert id="insert" parameterType="org.binggo.apiwatchdog.domain.ApiBadCall" >
+    insert into api_bad_call (api_id, request_time, response_time, 
+      http_reponse_code, api_return_code, api_return_message, 
+      source_service, source_host, dest_service, 
+      dest_host, request_body, response_body, 
+      call_uuid)
+    values (#{apiId,jdbcType=INTEGER}, #{requestTime,jdbcType=TIMESTAMP}, #{responseTime,jdbcType=TIMESTAMP}, 
+      #{httpReponseCode,jdbcType=VARCHAR}, #{apiReturnCode,jdbcType=VARCHAR}, #{apiReturnMessage,jdbcType=VARCHAR}, 
+      #{sourceService,jdbcType=VARCHAR}, #{sourceHost,jdbcType=VARCHAR}, #{destService,jdbcType=VARCHAR}, 
+      #{destHost,jdbcType=VARCHAR}, #{requestBody,jdbcType=VARCHAR}, #{responseBody,jdbcType=VARCHAR}, 
+      #{callUuid,jdbcType=VARBINARY})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="org.binggo.apiwatchdog.domain.ApiBadCall" >
+    insert into api_bad_call
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="apiId != null" >
+        api_id,
+      </if>
+      <if test="requestTime != null" >
+        request_time,
+      </if>
+      <if test="responseTime != null" >
+        response_time,
+      </if>
+      <if test="httpReponseCode != null" >
+        http_reponse_code,
+      </if>
+      <if test="apiReturnCode != null" >
+        api_return_code,
+      </if>
+      <if test="apiReturnMessage != null" >
+        api_return_message,
+      </if>
+      <if test="sourceService != null" >
+        source_service,
+      </if>
+      <if test="sourceHost != null" >
+        source_host,
+      </if>
+      <if test="destService != null" >
+        dest_service,
+      </if>
+      <if test="destHost != null" >
+        dest_host,
+      </if>
+      <if test="requestBody != null" >
+        request_body,
+      </if>
+      <if test="responseBody != null" >
+        response_body,
+      </if>
+      <if test="callUuid != null" >
+        call_uuid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="apiId != null" >
+        #{apiId,jdbcType=INTEGER},
+      </if>
+      <if test="requestTime != null" >
+        #{requestTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="responseTime != null" >
+        #{responseTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="httpReponseCode != null" >
+        #{httpReponseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="apiReturnCode != null" >
+        #{apiReturnCode,jdbcType=VARCHAR},
+      </if>
+      <if test="apiReturnMessage != null" >
+        #{apiReturnMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceService != null" >
+        #{sourceService,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceHost != null" >
+        #{sourceHost,jdbcType=VARCHAR},
+      </if>
+      <if test="destService != null" >
+        #{destService,jdbcType=VARCHAR},
+      </if>
+      <if test="destHost != null" >
+        #{destHost,jdbcType=VARCHAR},
+      </if>
+      <if test="requestBody != null" >
+        #{requestBody,jdbcType=VARCHAR},
+      </if>
+      <if test="responseBody != null" >
+        #{responseBody,jdbcType=VARCHAR},
+      </if>
+      <if test="callUuid != null" >
+        #{callUuid,jdbcType=VARBINARY},
+      </if>
+    </trim>
+  </insert>
+</mapper>
