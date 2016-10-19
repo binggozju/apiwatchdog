@@ -7,8 +7,16 @@ public class WatchdogResponse {
 	
 	private Object result;
 	
-	public WatchdogResponse(Object result) {
-		this(ReturnCode.OK, result);
+	// return ok without result
+	public static final WatchdogResponse OK_RESPONSE = new WatchdogResponse(
+			ReturnCode.OK, CollectionUtils.EMPTY_LIST);
+	
+	// return failure without result
+	public static final WatchdogResponse FAILURE_RESPONSE = new WatchdogResponse(
+			ReturnCode.FAILURE, CollectionUtils.EMPTY_LIST);
+	
+	public WatchdogResponse(ReturnCode returnCode) {
+		this(returnCode.getCode(), returnCode.getMsg(), CollectionUtils.EMPTY_LIST);
 	}
 	
 	public WatchdogResponse(ReturnCode returnCode, Object result) {

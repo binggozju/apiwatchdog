@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.collect.Lists;
+
+import org.binggo.apiwatchdog.common.ReturnCode;
+import org.binggo.apiwatchdog.common.WatchdogException;
 import org.binggo.apiwatchdog.mapper.ApiProviderMapper;
 import org.binggo.apiwatchdog.mapper.ApiItemMapper;
 import org.binggo.apiwatchdog.domain.ApiProvider;
@@ -27,44 +31,90 @@ public class ConfigService {
 	private ApiItemMapper apiItemMapper;
 	
 	// manage the API providers
-	public void addApiProvider(ApiProvider apiProvider) {
-		// TODO
+	public void addApiProvider(ApiProvider apiProvider) throws WatchdogException {
+		if (apiProvider == null || apiProvider.getName() == null || apiProvider.getWeixinReceivers() == null) {
+			throw new WatchdogException(ReturnCode.INVALID_PARAMETER);
+		}
+		
+		apiProviderMapper.insert(apiProvider);
 	}
 	
-	public void deleteApiProvider(Integer providerId) {
-		// TODO
+	public void deleteApiProvider(Integer providerId) throws WatchdogException {
+		if (providerId == null) {
+			throw new WatchdogException(ReturnCode.INVALID_PARAMETER, 
+					"providerId for deleteApiProvider is null");
+		}
+		
+		apiProviderMapper.deleteById(providerId);
 	}
 	
-	public void updateApiProvider(ApiProvider apiProvider) {
-		// TODO
+	public void updateApiProvider(ApiProvider apiProvider) throws WatchdogException {
+		if (apiProvider == null || apiProvider.getProviderId() == null) {
+			throw new WatchdogException(ReturnCode.INVALID_PARAMETER, 
+					"providerId for updateApiProvider is null");
+		}
+		
+		apiProviderMapper.updateById(apiProvider);
 	}
 	
 	public List<ApiProvider> listApiProviders() {
-		// TODO
-		return null;
+		List<ApiProvider> apiProviderList = apiProviderMapper.listApiProviders();
+		
+		if (apiProviderList == null) {
+			logger.warn("there is no api provider registered so far");
+			apiProviderList = Lists.newArrayList();
+		}
+		
+		return apiProviderList;
 	}
 	
 	// manage the API
-	public void addApiItem(ApiItem api) {
-		// TODO
+	public void addApiItem(ApiItem api) throws WatchdogException {
+		if (api == null || api.getName() == null) {
+			throw new WatchdogException(ReturnCode.INVALID_PARAMETER);
+		}
+		
+		apiItemMapper.insert(api);
 	}
 	
-	public void deleteApiItem(Integer apiId) {
-		// TODO
+	public void deleteApiItem(Integer apiId) throws WatchdogException {
+		if (apiId == null) {
+			throw new WatchdogException(ReturnCode.INVALID_PARAMETER, 
+					"apiId for deleteApiItem is null");
+		}
+
+		apiItemMapper.deleteById(apiId);
 	}
 	
-	public void updateApiItem(ApiItem api) {
-		// TODO
+	public void updateApiItem(ApiItem api) throws WatchdogException {
+		if (api == null || api.getApiId() == null) {
+			throw new WatchdogException(ReturnCode.INVALID_PARAMETER, 
+					"apiId for updateApiItem is null");
+		}
+		
+		apiItemMapper.updateById(api);
 	}
 	
 	public List<ApiItem> listApiItems(Integer providerId) {
-		// TODO
-		return null;
+		List<ApiItem> apiItemList = apiItemMapper.listApiItemsByProviderId(providerId);
+		
+		if (apiItemList == null) {
+			logger.warn(String.format("there is no api registered for api provider [providerId=%d]", providerId));
+			apiItemList = Lists.newArrayList();
+		}
+
+		return apiItemList;
 	}
 	
 	public List<ApiItem> listApiItems() {
-		// TODO
-		return null;
+		List<ApiItem> apiItemList = apiItemMapper.listApiItems();
+		
+		if (apiItemList == null) {
+			logger.warn("there is no api registered so far");
+			apiItemList = Lists.newArrayList();
+		}
+		
+		return apiItemList;
 	}
 	
 }

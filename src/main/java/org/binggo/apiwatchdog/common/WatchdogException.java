@@ -4,26 +4,35 @@ public class WatchdogException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 	
-	/**
-	 * @param message the exception message
-	 */
-	public WatchdogException(String message) {
+	private ReturnCode returnCode;
+	
+	/*public WatchdogException(String message) {
 		super(message);
 	}
 	
-	/**
-	 * @param ex the causal exception
-	 */
 	public WatchdogException(Throwable ex) {
 		super(ex);
 	}
 	
-	/**
-	 * @param message exception message
-	 * @param ex the causal exception
-	 */
 	public WatchdogException(String message, Throwable ex) {
 		super(message, ex);
+	}*/
+	
+	public WatchdogException(ReturnCode returnCode) {
+		this(returnCode, returnCode.getMsg());
+	}
+	
+	public WatchdogException(ReturnCode returnCode, String message) {
+		super(message);
+		this.returnCode = returnCode;
+	}
+
+	public ReturnCode getReturnCode() {
+		return returnCode;
+	}
+
+	public void setReturnCode(ReturnCode returnCode) {
+		this.returnCode = returnCode;
 	}
 
 }

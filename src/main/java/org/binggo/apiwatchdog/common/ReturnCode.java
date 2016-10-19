@@ -9,9 +9,8 @@ public enum ReturnCode {
 	
 	// common return code [0-100)
 	OK (0, "ok"),
-	FAILURE (1, "fail"),
-	MISSING_FIELDS (2, "some fields are missing"),
-	INVALID_PARAMETER (3, "some parameters are invalid");
+	INVALID_PARAMETER (1, "unvalid parameters"),
+	FAILURE (99, "fail");
 	
 	// return code for collector module
 	// return code for processor module
