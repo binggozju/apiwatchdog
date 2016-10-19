@@ -5,7 +5,7 @@ import org.binggo.apiwatchdog.domain.ApiStatData;
 
 @Mapper
 public interface ApiStatDataMapper {
-    int insert(ApiStatData record);
+	
+    int insert(ApiStatData apiStatData);
 
-    int insertSelective(ApiStatData record);
 }

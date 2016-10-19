@@ -1,20 +1,6 @@
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------
--- Table structure for api_alarm_metric
--- ----------------------------
-DROP TABLE IF EXISTS `api_alarm_metric`;
-CREATE TABLE `api_alarm_metric` (
-  `api_id` int(10) unsigned NOT NULL COMMENT 'api的id',
-  `metric_not200` tinyint(4) NOT NULL DEFAULT '1' COMMENT 'http响应码非200时是否告警，1->是，0->否',
-  `metric_200_not0` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'http响应码为200但api返回码非0时是否告警，1->是，0->否',
-  `metric_resptime_threshold` tinyint(4) NOT NULL DEFAULT '1' COMMENT '没有收到http响应或超时是否告警，1->是，0->否',
-  `alarm_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '告警方式：1->微信, 2->邮件, 3->微信&邮件, 4->短信, 依次类推',
-  `created_time` datetime NOT NULL,
-  `last_updated_time` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- ----------------------------
 -- Table structure for api_bad_call
 -- ----------------------------
 DROP TABLE IF EXISTS `api_bad_call`;
@@ -23,7 +9,7 @@ CREATE TABLE `api_bad_call` (
   `api_id` int(10) unsigned NOT NULL COMMENT 'api的id',
   `call_uuid` varbinary(16) NOT NULL COMMENT 'api调用的uuid',
   `request_time` datetime NOT NULL COMMENT '发起request的时间',
-  `response_time` datetime NOT NULL COMMENT '收到response的时间',
+  `response_time` datetime DEFAULT NULL  COMMENT '收到response的时间',
   `http_reponse_code` varchar(3) DEFAULT '' COMMENT 'response中的http响应码',
   `api_return_code` varchar(12) DEFAULT '' COMMENT 'response中的api返回码',
   `api_return_message` varchar(128) DEFAULT '' COMMENT 'response中的api返回码的解释文本',
@@ -42,17 +28,21 @@ CREATE TABLE `api_bad_call` (
 -- ----------------------------
 DROP TABLE IF EXISTS `api_item`;
 CREATE TABLE `api_item` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `api_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(128) NOT NULL COMMENT 'api的名称',
   `description` text COMMENT 'api的简要描述',
   `path` varchar(512) NOT NULL COMMENT 'api的访问路径，如/your/api/path',
   `type` varchar(32) NOT NULL COMMENT 'api的类型，如GET/POST/PUT/DELETE',
   `version` varchar(32) DEFAULT '' COMMENT 'api的版本号',
-  `service_id` int(10) unsigned NOT NULL COMMENT 'api所属service的id',
+  `provider_id` int(10) unsigned NOT NULL COMMENT 'api所属service的id',
   `state` tinyint(4) NOT NULL DEFAULT '1' COMMENT '标识该api是否启用监控，1->启用，0->禁用',
+  `metric_not200` tinyint(4) NOT NULL DEFAULT '1' COMMENT 'http响应码非200时是否告警，1->是，0->否',
+  `metric_200_not0` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'http响应码为200但api返回码非0时是否告警，1->是，0->否',
+  `metric_resptime_threshold` tinyint(4) NOT NULL DEFAULT '1' COMMENT '没有收到http响应或超时是否告警，1->是，0->否',
+  `alarm_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '告警方式：1->微信, 2->邮件, 3->微信&邮件, 4->短信, 依次类推',
   `created_time` datetime NOT NULL,
   `last_updated_time` datetime NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`api_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -60,7 +50,7 @@ CREATE TABLE `api_item` (
 -- ----------------------------
 DROP TABLE IF EXISTS `api_provider`;
 CREATE TABLE `api_provider` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `provider_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL COMMENT 'api提供者服务的英文名称，建议统一用小写',
   `description` text COMMENT 'api提供者服务的简要描述',
   `version` varchar(32) DEFAULT '' COMMENT 'api提供者服务的版本号',
@@ -70,7 +60,7 @@ CREATE TABLE `api_provider` (
   `phone_receivers` varchar(256) NOT NULL COMMENT '短信告警接收人，多人之间用分号隔开',
   `created_time` datetime NOT NULL,
   `last_updated_time` datetime NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`provider_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------

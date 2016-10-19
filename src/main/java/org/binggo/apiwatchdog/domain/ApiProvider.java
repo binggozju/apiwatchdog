@@ -1,7 +1,7 @@
 package org.binggo.apiwatchdog.domain;
 
 public class ApiProvider {
-    private Integer id;
+    private Integer providerId;
 
     private String name;
 
@@ -17,12 +17,12 @@ public class ApiProvider {
 
     private String description;
 
-    public Integer getId() {
-        return id;
+    public Integer getProviderId() {
+        return providerId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setProviderId(Integer providerId) {
+        this.providerId = providerId;
     }
 
     public String getName() {

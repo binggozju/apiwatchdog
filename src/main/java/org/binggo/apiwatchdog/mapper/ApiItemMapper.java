@@ -1,21 +1,22 @@
 package org.binggo.apiwatchdog.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
+
 import org.binggo.apiwatchdog.domain.ApiItem;
 
 @Mapper
 public interface ApiItemMapper {
-    int deleteByPrimaryKey(Integer id);
+	
+	int insert(ApiItem apiItem);
 
-    int insert(ApiItem record);
+    int deleteById(Integer apiId);
 
-    int insertSelective(ApiItem record);
-
-    ApiItem selectByPrimaryKey(Integer id);
-
-    int updateByPrimaryKeySelective(ApiItem record);
-
-    int updateByPrimaryKeyWithBLOBs(ApiItem record);
-
-    int updateByPrimaryKey(ApiItem record);
+    int updateById(ApiItem apiItem);
+    
+    List<ApiItem> listApiItemsByProviderId(Integer providerId);
+    
+    List<ApiItem> listApiItems();
+    
 }

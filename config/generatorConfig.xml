@@ -34,38 +34,39 @@
     </javaClientGenerator>
 
 	<!-- data tables config -->
+	<!-- 
 	<table tableName="api_provider" domainObjectName="ApiProvider" modelType="flat" 
 		enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" 
     	enableSelectByExample="false" selectByExampleQueryId="false">
     	<ignoreColumn column="created_time" />
 		<ignoreColumn column="last_updated_time" />
 	</table>
+	-->
 	
+	<!-- 
 	<table tableName="api_item" domainObjectName="ApiItem" modelType="flat" 
 		enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" 
     	enableSelectByExample="false" selectByExampleQueryId="false">
 		<ignoreColumn column="created_time" />
 		<ignoreColumn column="last_updated_time" />
 	</table>
+	-->
 	
-	<table tableName="api_alarm_metric" domainObjectName="ApiAlarmMetric" modelType="flat" 
-		enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" 
-    	enableSelectByExample="false" selectByExampleQueryId="false">
-		<ignoreColumn column="created_time" />
-		<ignoreColumn column="last_updated_time" />
-	</table>
-	
+	<!-- 
 	<table tableName="api_stat_data" domainObjectName="ApiStatData" modelType="flat" 
 		enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" 
     	enableSelectByExample="false" selectByExampleQueryId="false">
 		<ignoreColumn column="id" />
 	</table>
+	-->
 	
+	<!-- 
 	<table tableName="api_bad_call" domainObjectName="ApiBadCall" modelType="flat" 
 		enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" 
     	enableSelectByExample="false" selectByExampleQueryId="false">
 		<ignoreColumn column="id" />
 	</table>
+	-->
   </context>
   
 </generatorConfiguration>

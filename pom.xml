@@ -19,6 +19,7 @@
   <properties>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   	<java.version>1.8</java.version>
+  	<guava.version>19.0</guava.version>
   	<zookeeper.version>3.4.6</zookeeper.version>
   	<kafka.version>0.8.1.1</kafka.version>
   </properties>
@@ -34,7 +35,7 @@
 	    <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     
-    <!-- kafka -->
+    <!-- kafka and zookeeper -->
     <dependency>
 	    <groupId>org.apache.kafka</groupId>
 	    <artifactId>kafka_2.10</artifactId>
@@ -47,7 +48,7 @@
 	    <version>${zookeeper.version}</version>
     </dependency>
 
-    <!-- mysql and mybatis -->
+    <!-- mysql, mybatis and paging -->
     <dependency>
 		<groupId>mysql</groupId>
     	<artifactId>mysql-connector-java</artifactId>
@@ -58,7 +59,6 @@
 		<version>1.1.1</version>
 	</dependency>
 	
-	<!-- mybatis paging -->
 	<dependency>
     	<groupId>com.github.pagehelper</groupId>
     	<artifactId>pagehelper</artifactId>
@@ -67,14 +67,20 @@
 	
 	<!-- utility package -->
 	<dependency>
-		<groupId>org.apache.httpcomponents</groupId>
-		<artifactId>httpclient</artifactId>
+		<groupId>com.google.guava</groupId>
+		<artifactId>guava</artifactId>
+		<version>${guava.version}</version>
 	</dependency>
-    
-    <dependency>
+	
+	<dependency>
     	<groupId>com.google.code.gson</groupId>
     	<artifactId>gson</artifactId>
     </dependency>
+	
+	<dependency>
+		<groupId>org.apache.httpcomponents</groupId>
+		<artifactId>httpclient</artifactId>
+	</dependency>
 	
 	<!-- test -->
 	<dependency>
