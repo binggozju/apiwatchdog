@@ -10,6 +10,9 @@ public enum ReturnCode {
 	// common return code [0-100)
 	OK (0, "ok"),
 	INVALID_PARAMETER (1, "unvalid parameters"),
+	
+	FAIL_LOAD_PROCESSOR (80, "fail to load the processor"),
+	FAIL_CREATE_PROCESSOR (81, "fail to create the processor"),
 	FAILURE (99, "fail");
 	
 	// return code for collector module

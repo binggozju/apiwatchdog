@@ -2,7 +2,7 @@ package org.binggo.apiwatchdog.domain;
 
 import java.util.Date;
 
-public class ApiBadCall {
+public class ApiCall {
     private Integer apiId;
 
     private Date requestTime;

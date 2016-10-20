@@ -16,6 +16,16 @@
     <result column="alarm_type" property="alarmType" jdbcType="TINYINT" />
   </resultMap>
   
+  <resultMap id="ApiConfResultMap" type="org.binggo.apiwatchdog.config.ApiConfiguration">
+  	<id column="api_id" property="apiId" jdbcType="INTEGER" />
+  	<result column="provider_id" property="providerId" jdbcType="INTEGER" />
+    <result column="state" property="state" jdbcType="TINYINT" />
+    <result column="metric_not200" property="metricNot200" jdbcType="TINYINT" />
+    <result column="metric_200_not0" property="metric200Not0" jdbcType="TINYINT" />
+    <result column="metric_resptime_threshold" property="metricResptimeThreshold" jdbcType="TINYINT" />
+    <result column="alarm_type" property="alarmType" jdbcType="TINYINT" />
+  </resultMap>
+  
   <sql id="Base_Column_List" >
     name, description, path, type, version, provider_id, state, 
     metric_not200, metric_200_not0, metric_resptime_threshold, alarm_type
@@ -94,6 +104,14 @@
   		api_id,
   		<include refid="Base_Column_List" />
   	from api_item
+  </select>
+  
+  <!-- for ApiConfiguration -->
+  <select id="listApiConf" resultMap="ApiConfResultMap">
+  	select api_id, provider_id, state, 
+    	metric_not200, metric_200_not0, metric_resptime_threshold, 
+    	alarm_type
+    from api_item
   </select>
   
 </mapper>

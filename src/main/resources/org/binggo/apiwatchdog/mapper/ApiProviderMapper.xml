@@ -12,6 +12,15 @@
     <result column="phone_receivers" property="phoneReceivers" jdbcType="VARCHAR" />
   </resultMap>
   
+  <resultMap id="ProviderConfResultMap" type="org.binggo.apiwatchdog.config.ProviderConfiguration">
+  	<id column="provider_id" property="providerId" jdbcType="INTEGER" />
+  	<result column="state" property="state" jdbcType="TINYINT" />
+  	<result column="weixin_receivers" property="weixinReceivers" jdbcType="VARCHAR" />
+    <result column="mail_receivers" property="mailReceivers" jdbcType="VARCHAR" />
+    <result column="phone_receivers" property="phoneReceivers" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  
   <sql id="Base_Column_List" >
     name, description, version, state, weixin_receivers, mail_receivers, phone_receivers
   </sql>
@@ -68,6 +77,12 @@
   		provider_id,
   		<include refid="Base_Column_List" />
   	 from api_provider
+  </select>
+  
+  <!-- for ProviderConfiguration -->
+  <select id="listProviderConf" resultMap="ProviderConfResultMap">
+  	select provider_id, state, weixin_receivers, mail_receivers, phone_receivers
+  	from api_provider
   </select>
 
 </mapper>
