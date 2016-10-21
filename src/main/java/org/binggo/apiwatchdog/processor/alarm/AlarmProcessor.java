@@ -12,7 +12,7 @@ import org.binggo.apiwatchdog.domain.ApiCall;
 import org.binggo.apiwatchdog.processor.Event;
 import org.binggo.apiwatchdog.processor.Processor;
 
-@Component
+@Component("alarmProcessor")
 public class AlarmProcessor implements Processor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AlarmProcessor.class);

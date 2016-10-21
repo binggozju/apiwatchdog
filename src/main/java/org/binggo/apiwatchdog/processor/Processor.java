@@ -4,6 +4,11 @@ import java.util.List;
 
 import org.binggo.apiwatchdog.domain.ApiCall;
 
+/**
+ * Processor can be used to consume the API call information in various ways.
+ * @author Administrator
+ *
+ */
 public interface Processor {
 	
 	/**

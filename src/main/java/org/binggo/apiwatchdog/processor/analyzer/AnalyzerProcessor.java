@@ -11,7 +11,7 @@ import org.binggo.apiwatchdog.domain.ApiCall;
 import org.binggo.apiwatchdog.processor.Event;
 import org.binggo.apiwatchdog.processor.Processor;
 
-@Component
+@Component("analyzerProcessor")
 public class AnalyzerProcessor implements Processor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AnalyzerProcessor.class);

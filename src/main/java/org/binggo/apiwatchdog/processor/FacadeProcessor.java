@@ -10,9 +10,10 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
 
+import org.binggo.apiwatchdog.config.Config;
 import org.binggo.apiwatchdog.domain.ApiCall;
 
-@Component
+@Component("facadeProcessor")
 public class FacadeProcessor implements Processor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(FacadeProcessor.class);
@@ -20,6 +21,9 @@ public class FacadeProcessor implements Processor {
 	//private ProcessorFactory processorFactory;
 	
 	private Map<ProcessorType, Processor> processors;
+	
+	@Autowired
+	private Config config;
 	
 	@Autowired
 	public FacadeProcessor() {

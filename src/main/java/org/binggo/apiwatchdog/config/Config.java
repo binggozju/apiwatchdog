@@ -18,6 +18,11 @@ import com.google.common.collect.Lists;
 import org.binggo.apiwatchdog.mapper.ApiItemMapper;
 import org.binggo.apiwatchdog.mapper.ApiProviderMapper;
 
+/**
+ * Config is used to manage the configuration of API providers and corresponding API.
+ * @author Administrator
+ *
+ */
 @Component
 public class Config {
 	

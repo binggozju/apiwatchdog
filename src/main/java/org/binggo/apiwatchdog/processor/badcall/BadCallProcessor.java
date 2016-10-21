@@ -13,7 +13,7 @@ import org.binggo.apiwatchdog.mapper.ApiBadCallMapper;
 import org.binggo.apiwatchdog.processor.Event;
 import org.binggo.apiwatchdog.processor.Processor;
 
-@Component
+@Component("badCallProcessor")
 public class BadCallProcessor implements Processor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(BadCallProcessor.class);

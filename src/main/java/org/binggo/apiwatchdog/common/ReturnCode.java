@@ -11,11 +11,18 @@ public enum ReturnCode {
 	OK (0, "ok"),
 	INVALID_PARAMETER (1, "unvalid parameters"),
 	
+	INTERRUPTED (10, "operation has be interrupted"),
+	
 	FAIL_LOAD_PROCESSOR (80, "fail to load the processor"),
 	FAIL_CREATE_PROCESSOR (81, "fail to create the processor"),
-	FAILURE (99, "fail");
+	FAILURE (99, "fail"),
 	
-	// return code for collector module
+	// return code for collector module [100, 200)
+	COLLECT_QUEUE_FULL (100, "collect queue is full"),
+	INVALID_API_CALL (101, "invalid api call");
+	
+	
+	
 	// return code for processor module
 	// return code for config module
 	// return code for alarm module
