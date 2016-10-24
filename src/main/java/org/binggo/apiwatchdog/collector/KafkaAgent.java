@@ -14,6 +14,7 @@ import org.apache.kafka.common.errors.WakeupException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
 
@@ -24,6 +25,7 @@ import org.binggo.apiwatchdog.common.WatchdogEnv;
  * @author Administrator
  *
  */
+@Component
 public class KafkaAgent {
 	
 	private static final Logger logger = LoggerFactory.getLogger(KafkaAgent.class);
@@ -40,8 +42,8 @@ public class KafkaAgent {
 	
 	// primary kafka configuration
 	private String topic;
-	private String group;  // consumer group
-	private Integer consumerNum;
+	private String group;  // consumer group name
+	private Integer consumerNum;  // the number of consumer thread
 	private String kafkaServers;
 	
 	private Properties kafkaProperties;

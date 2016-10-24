@@ -86,6 +86,9 @@ public class Collector {
 		} catch (JsonSyntaxException ex) {
 			logger.error(String.format("the api call of json format is invalid: %s", apiCallStr));
 			return;
+		} catch (WatchdogException ex) {
+			logger.error("the collector queue is full, fail to put the ApiCall from kafka to collector");
+			return;
 		}
 	}
 
@@ -102,6 +105,8 @@ public class Collector {
 		logger.info(String.format("start collector thread [%s] to dispatch all the api call", threadName));
 		
 		// take ApiCall from the queue in loop, and process it by processor
+		processor.initialize();
+		
 		while (true) {
 			try {
 				ApiCall apiCall = collectorQueue.poll();
@@ -113,6 +118,8 @@ public class Collector {
 				
 			} catch (InterruptedException ex) {
 				logger.error(String.format("the collector thread [%d] has been interrupted", threadName));
+				// spring will restart the collector thread, there is no need to close the processor.
+				//processor.close(); 
 				return;
 			}	
 		}

@@ -4,6 +4,7 @@ import java.util.Properties;
 
 public class KafkaAgentUtils {
 	
+	// the normal configuration items of kafka's consumer
 	public static final String BOOTSTRAP_SERVERS = "bootstrap.servers";
 	public static final String BOOTSTRAP_SERVERS_DEFAULT = "localhost:9092";
 	
