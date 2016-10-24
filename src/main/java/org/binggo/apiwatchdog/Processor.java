@@ -1,4 +1,4 @@
-package org.binggo.apiwatchdog.processor;
+package org.binggo.apiwatchdog;
 
 import java.util.List;
 

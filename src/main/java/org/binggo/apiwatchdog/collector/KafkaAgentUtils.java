@@ -5,10 +5,10 @@ import java.util.Properties;
 public class KafkaAgentUtils {
 	
 	// the normal configuration items of kafka's consumer
-	public static final String BOOTSTRAP_SERVERS = "bootstrap.servers";
+	public static final String BOOTSTRAP_SERVERS_CONFIG = "bootstrap.servers";
 	public static final String BOOTSTRAP_SERVERS_DEFAULT = "localhost:9092";
 	
-	public static final String GROUP_ID = "group.id";
+	public static final String GROUP_ID_CONFIG = "group.id";
 	public static final String GROUP_ID_DEFAULT = "apiwatchdog";
 	
 	// generate a default kafka properties

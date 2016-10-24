@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
 
+import org.binggo.apiwatchdog.Processor;
 import org.binggo.apiwatchdog.domain.ApiCall;
 
 @Component("facadeProcessor")

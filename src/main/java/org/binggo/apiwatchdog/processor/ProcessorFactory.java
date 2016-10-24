@@ -9,7 +9,7 @@ import com.google.common.collect.Maps;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-
+import org.binggo.apiwatchdog.Processor;
 import org.binggo.apiwatchdog.common.ReturnCode;
 import org.binggo.apiwatchdog.common.WatchdogException;
 import org.binggo.apiwatchdog.processor.alarm.AlarmProcessor;

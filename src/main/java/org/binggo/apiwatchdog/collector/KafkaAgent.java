@@ -32,13 +32,13 @@ public class KafkaAgent {
 	
 	private static final Long FETCH_DATA_TIMEOUT = 10L;  // seconds
 	
-	private static final String SERVERS_CONFIG_NAME = "kafka.bootstrap.servers";
-	private static final String GROUP_CONFIG_NAME = "kafka.group.id";
-	private static final String CONSUMER_NUM_CONFIG_NAME = "kafka.consumer.num";
-	private static final String TOPIC_CONFIG_NAME = "kafka.topic";
+	private static final String KAFKA_SERVERS_CONFIG = "kafka.bootstrap.servers";
+	private static final String KAFKA_GROUP_CONFIG = "kafka.group.id";
+	private static final String KAFKA_CONSUMER_NUM_CONFIG = "kafka.consumer.num";
+	private static final String KAFKA_TOPIC_CONFIG = "kafka.topic";
 	
-	private static final Integer CONSUMER_NUM_DEFAULT = 2;
-	private static final String TOPIC_DEFAULT = "apiwatchdog-apicall";
+	private static final Integer KAFKA_CONSUMER_NUM_DEFAULT = 2;
+	private static final String KAFKA_TOPIC_DEFAULT = "apiwatchdog-apicall";
 	
 	// primary kafka configuration
 	private String topic;
@@ -58,10 +58,10 @@ public class KafkaAgent {
 	
 	@Autowired
 	public KafkaAgent(WatchdogEnv env) {
-		topic = env.getString(TOPIC_CONFIG_NAME, TOPIC_DEFAULT);
-		group = env.getString(GROUP_CONFIG_NAME, KafkaAgentUtils.GROUP_ID_DEFAULT);
-		consumerNum = env.getInteger(CONSUMER_NUM_CONFIG_NAME, CONSUMER_NUM_DEFAULT);
-		kafkaServers = env.getString(SERVERS_CONFIG_NAME, KafkaAgentUtils.BOOTSTRAP_SERVERS_DEFAULT);
+		topic = env.getString(KAFKA_TOPIC_CONFIG, KAFKA_TOPIC_DEFAULT);
+		group = env.getString(KAFKA_GROUP_CONFIG, KafkaAgentUtils.GROUP_ID_DEFAULT);
+		consumerNum = env.getInteger(KAFKA_CONSUMER_NUM_CONFIG, KAFKA_CONSUMER_NUM_DEFAULT);
+		kafkaServers = env.getString(KAFKA_SERVERS_CONFIG, KafkaAgentUtils.BOOTSTRAP_SERVERS_DEFAULT);
 		
 		kafkaProperties = new Properties();
 
@@ -71,8 +71,8 @@ public class KafkaAgent {
 	private void initialize() {
 		if (!initialized) {
 			kafkaProperties = KafkaAgentUtils.getDefaultProperties();
-			kafkaProperties.put(KafkaAgentUtils.BOOTSTRAP_SERVERS, kafkaServers);
-			kafkaProperties.put(KafkaAgentUtils.GROUP_ID, group);
+			kafkaProperties.put(KafkaAgentUtils.BOOTSTRAP_SERVERS_CONFIG, kafkaServers);
+			kafkaProperties.put(KafkaAgentUtils.GROUP_ID_CONFIG, group);
 			
 			initialized = true;
 		}

@@ -1,27 +1,27 @@
-package org.binggo.apiwatchdog.processor;
+package org.binggo.apiwatchdog;
 
 import java.util.Map;
 
 import com.google.common.collect.Maps;
 
 /**
- * <p>Event is a message made up of the headers and the body.</p>
+ * <p>WatchdogEvent is a message made up of the headers and the body.</p>
  * @author Administrator
  *
  */
-public class Event {
+public class WatchdogEvent {
 	
 	private Map<String, String> headers;
 	
 	private Object body;
 	
-	public Event(Map<String, String> headers, Object body) {
+	public WatchdogEvent(Map<String, String> headers, Object body) {
 		this.headers = headers;
 		this.body = body;
 	}
 
-	public static Event BuildEvent(Object body) {
-		return new Event(null, body);
+	public static WatchdogEvent buildEvent(Object body) {
+		return new WatchdogEvent(null, body);
 	}
 	
 	public void addHeader(String key, String value) {

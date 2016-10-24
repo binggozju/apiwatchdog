@@ -14,21 +14,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
+import org.binggo.apiwatchdog.Processor;
 import org.binggo.apiwatchdog.common.ReturnCode;
 import org.binggo.apiwatchdog.common.WatchdogEnv;
 import org.binggo.apiwatchdog.common.WatchdogException;
 import org.binggo.apiwatchdog.domain.ApiCall;
-import org.binggo.apiwatchdog.processor.Processor;
 
 @Component
 public class Collector {
 	
 	private static final Logger logger = LoggerFactory.getLogger(Collector.class);
 	
-	private static final String QUEUE_CAPACITY_NAME = "apiwatchdog.collector.queue.capacity";
+	private static final String QUEUE_CAPACITY_CONFIG = "apiwatchdog.collector.queue.capacity";
 	private static final Integer QUEUE_CAPACITY_DEFAULT = 10000;
-	private static final String QUEUE_TIMEOUT_NAME = "apiwatchdog.collector.queue.timeout";
+	private static final String QUEUE_TIMEOUT_CONFIG = "apiwatchdog.collector.queue.timeout";
 	private static final Long QUEUE_TIMEOUT_DEFAULT =  2L; // 2 seconds for offer
 	
 	private Integer queueCapacity;
@@ -50,8 +49,8 @@ public class Collector {
 	
 	@Autowired
 	public Collector(WatchdogEnv env) {
-		queueCapacity = env.getInteger(QUEUE_CAPACITY_NAME, QUEUE_CAPACITY_DEFAULT);
-		queueTimeout = env.getLong(QUEUE_TIMEOUT_NAME, QUEUE_TIMEOUT_DEFAULT);
+		queueCapacity = env.getInteger(QUEUE_CAPACITY_CONFIG, QUEUE_CAPACITY_DEFAULT);
+		queueTimeout = env.getLong(QUEUE_TIMEOUT_CONFIG, QUEUE_TIMEOUT_DEFAULT);
 
 		collectorQueue = new LinkedBlockingQueue<ApiCall>(queueCapacity);
 		
@@ -121,7 +120,7 @@ public class Collector {
 				// spring will restart the collector thread, there is no need to close the processor.
 				//processor.close(); 
 				return;
-			}	
+			}
 		}
 	}
 

@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
 
+import org.binggo.apiwatchdog.WatchdogEvent;
+import org.binggo.apiwatchdog.domain.ApiCall;
 import org.binggo.apiwatchdog.mapper.ApiItemMapper;
 import org.binggo.apiwatchdog.mapper.ApiProviderMapper;
 
@@ -52,7 +54,74 @@ public class Config {
 		apiConfCacheMap = new HashMap<Integer, ApiConfiguration>();
 	}
 	
-	// TODO: get configuration with read lock
+	/**
+	 * <p>If the apiCall need to be alarmed, generate a WatchdogEvent and add the alarm receivers
+	 * to the header of it.</p>
+	 * <p>if not, return null.</p>
+	 * @param apiCall
+	 * @return
+	 */
+	public WatchdogEvent generateAlarmEvent(ApiCall apiCall) {
+		WatchdogEvent event = null;
+		Integer apiId = apiCall.getApiId();
+		
+		confRWLock.readLock().lock();
+		
+		Integer providerId = apiConfMap.get(apiId).getProviderId();
+		String alarmType = apiConfMap.get(apiId).getAlarmType().toString();
+		String weixinReceivers = providerConfMap.get(providerId).getWeixinReceivers();
+		String mailReceivers = providerConfMap.get(providerId).getMailReceivers();
+		String phoneReceivers = providerConfMap.get(providerId).getPhoneReceivers();
+		
+		event = genInitialAlarmEvent(apiCall);
+		confRWLock.readLock().unlock();
+		
+		if (event != null) {
+			event.addHeader("alarmType",alarmType);
+			event.addHeader("weixinReceivers", weixinReceivers);
+			event.addHeader("mailReceivers", mailReceivers);
+			event.addHeader("phoneReceivers", phoneReceivers);
+		}
+		return event;
+	}
+	
+	private WatchdogEvent genInitialAlarmEvent(ApiCall apiCall) {
+		Integer apiId = apiCall.getApiId();
+		Integer providerId = apiConfMap.get(apiId).getProviderId();
+		
+		WatchdogEvent initialEvent = null;
+		
+		if (providerConfMap.get(providerId).getState() == 0) {
+			return initialEvent;
+		}
+		if (apiConfMap.get(apiId).getState() == 0) {
+			return initialEvent;
+		}
+		
+		// check whether there is a response
+		if (apiCall.getResponseTime() == null) {
+			initialEvent = WatchdogEvent.buildEvent(apiCall);
+			return initialEvent;
+		}
+		// check the response time
+		int timeDelta = (int)(apiCall.getResponseTime().getTime() - apiCall.getRequestTime().getTime())/1000;
+		if (timeDelta >= apiConfMap.get(apiId).getMetricResptimeThreshold()) {
+			initialEvent = WatchdogEvent.buildEvent(apiCall);
+			return initialEvent;
+		}
+		// check the response code of HTTP
+		if (apiCall.getHttpReponseCode() != "200" && apiConfMap.get(apiId).getMetricNot200() !=0) {
+			initialEvent = WatchdogEvent.buildEvent(apiCall);
+			return initialEvent;
+		}
+		// check the return code
+		/*if (apiCall.getApiReturnCode() != "0" && apiConfMap.get(apiId).getMetric200Not0() !=0) {
+			initialEvent = WatchdogEvent.buildEvent(apiCall);
+			return initialEvent;
+		}*/
+		
+		return initialEvent;
+	}
 	
 	
 	/**
