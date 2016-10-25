@@ -120,20 +120,18 @@ public class BadCallProcessor implements Processor {
 		logger.info(String.format("start bad call thread [%s]", threadName));
 		
 		while (true) {
-			try {
-				ApiCall apiCall = badCallQueue.poll();
-				if (apiCall == null) {
+			ApiCall apiCall = badCallQueue.poll();
+			if (apiCall == null) {
+				try {
 					Thread.sleep(IDLE_SLEEP_TIME*1000);
 					continue;
+				} catch (InterruptedException ex) {
+					logger.warn(ex.getMessage());
+					continue;
 				}
-				
-				// store the bad call to MySQL
-				apiBadCallMapper.insert(apiCall);
-			
-			} catch (InterruptedException ex) {
-				logger.error(String.format("the bad call thread [%d] has been interrupted", threadName));
-				return;
 			}
+			// store the bad call to MySQL
+			apiBadCallMapper.insert(apiCall);
 		}	
 	}
 

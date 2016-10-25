@@ -19,6 +19,7 @@ import org.binggo.apiwatchdog.WatchdogEvent;
 import org.binggo.apiwatchdog.domain.ApiCall;
 import org.binggo.apiwatchdog.mapper.ApiItemMapper;
 import org.binggo.apiwatchdog.mapper.ApiProviderMapper;
+import org.binggo.apiwatchdog.processor.alarm.AlarmTemplate;
 
 /**
  * Config is used to manage the configuration of API providers and corresponding API.
@@ -77,10 +78,10 @@ public class Config {
 		confRWLock.readLock().unlock();
 		
 		if (event != null) {
-			event.addHeader("alarmType",alarmType);
-			event.addHeader("weixinReceivers", weixinReceivers);
-			event.addHeader("mailReceivers", mailReceivers);
-			event.addHeader("phoneReceivers", phoneReceivers);
+			event.addHeader(AlarmTemplate.ALARM_TYPE_KEY, alarmType);
+			event.addHeader(AlarmTemplate.WEIXIN_RECEIVERS_KEY, weixinReceivers);
+			event.addHeader(AlarmTemplate.MAIL_RECEIVERS_KEY, mailReceivers);
+			event.addHeader(AlarmTemplate.SMS_RECEIVERS_KEY, phoneReceivers);
 		}
 		return event;
 	}
@@ -101,22 +102,26 @@ public class Config {
 		// check whether there is a response
 		if (apiCall.getResponseTime() == null) {
 			initialEvent = WatchdogEvent.buildEvent(apiCall);
+			initialEvent.addHeader(AlarmTemplate.ALARM_REASON_KEY, AlarmTemplate.ALARM_REASON_NO_RESPONSE);
 			return initialEvent;
 		}
 		// check the response time
 		int timeDelta = (int)(apiCall.getResponseTime().getTime() - apiCall.getRequestTime().getTime())/1000;
 		if (timeDelta >= apiConfMap.get(apiId).getMetricResptimeThreshold()) {
 			initialEvent = WatchdogEvent.buildEvent(apiCall);
+			initialEvent.addHeader(AlarmTemplate.ALARM_REASON_KEY, AlarmTemplate.ALARM_REASON_EXCEED_THRESHOLD);
 			return initialEvent;
 		}
 		// check the response code of HTTP
 		if (apiCall.getHttpReponseCode() != "200" && apiConfMap.get(apiId).getMetricNot200() !=0) {
 			initialEvent = WatchdogEvent.buildEvent(apiCall);
+			initialEvent.addHeader(AlarmTemplate.ALARM_REASON_KEY, AlarmTemplate.ALARM_REASON_NOT_HTTP200);
 			return initialEvent;
 		}
 		// check the return code
 		/*if (apiCall.getApiReturnCode() != "0" && apiConfMap.get(apiId).getMetric200Not0() !=0) {
 			initialEvent = WatchdogEvent.buildEvent(apiCall);
+			initialEvent.addHeader(AlarmTemplate.ALARM_REASON_KEY, AlarmTemplate.ALARM_REASON_NOT_RETCODE0);
 			return initialEvent;
 		}*/
 		

@@ -19,13 +19,15 @@ public enum ReturnCode {
 	
 	// return code for collector module [100, 200)
 	COLLECT_QUEUE_FULL (100, "collect queue is full"),
-	INVALID_API_CALL (101, "invalid api call");
+	INVALID_API_CALL (101, "invalid api call"),
 	
+	// return code for alarm module [200, 300)
+	POST_HTTP_REQUEST_FAIL (200, "fail to send the post http request"),
+	GET_HTTP_REQUEST_FAIL (201, "fail to send the get http request");
 	
 	
 	// return code for processor module
 	// return code for config module
-	// return code for alarm module
 	// return code for onlineanalyzer module
 	// return code for statis module
 	// return code for badcall module
