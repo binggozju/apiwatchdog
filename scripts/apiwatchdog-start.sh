@@ -9,7 +9,7 @@ if [ $# -ne 1 ]; then
 	exit 1
 if
 
-ENV=$S
+ENV=$1
 case $ENV in
 	local|pre-release|production)
 	;;
@@ -44,5 +44,5 @@ elif [ -f libs/apiwatchdog.jar ]; then
 	exec java $JAVA_OPTS -jar libs/apiwatchdog.jar $APIWATCHDOG_OPTS
 else
 	echo "Error: apiwatchdog.jar not found"
+	exit 1
 fi
-

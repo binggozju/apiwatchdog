@@ -78,7 +78,7 @@ public class KafkaAgent {
 		}
 	}
 	
-	@Scheduled(fixedDelay = 5*1000)
+	//@Scheduled(fixedDelay = 5*1000)
 	public void runKafkaConsumer() {
 		if (consumerThreadMap.size() != 0) {
 			logger.info("The consumer threads have already exist");

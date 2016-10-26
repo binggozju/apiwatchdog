@@ -26,4 +26,3 @@ else
     nohup ./scripts/apiwatchdog-start.sh > $APIWATCHDOG_LOG_FILE 2>&1 &
     log INFO "apiwatchdog-supervisor has restarted apiwatchdog"
 fi
-
