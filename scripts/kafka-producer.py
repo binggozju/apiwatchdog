@@ -11,15 +11,15 @@ zk_hosts = "127.0.0.1:2181"
 #zk_hosts = "10.168.72.226:2181,10.168.76.90:2181,10.168.59.183:2181"
 
 def main():
-	client = KafkaClient(hosts=kafka_hosts)
-	topic = client.topics[topic_name]
-	print "now you can send message to topic '%s'" % (topic_name)
-	with topic.get_sync_producer() as producer:
-		while True:
-			msg = raw_input(">> ")
-			producer.produce(msg)
+    client = KafkaClient(hosts=kafka_hosts)
+    topic = client.topics[topic_name]
+    print "now you can send message to topic '%s'" % (topic_name)
+    with topic.get_sync_producer() as producer:
+        while True:
+            msg = raw_input(">> ")
+            producer.produce(msg)
 
 
 if __name__ == "__main__":
-	sys.exit(main())
+    sys.exit(main())
 

@@ -20,7 +20,7 @@ function log() {
 
 EXIST=$(ps aux | grep "apiwatchdog.properties" | grep -v grep | wc -l)
 if [ $EXIST -gt 0 ]; then
-    log INFO "apiwatchdog is running"
+	log INFO "apiwatchdog is running"
 else
     log ERROR "apiwatchdog has stopped"
     nohup ./scripts/apiwatchdog-start.sh > $APIWATCHDOG_LOG_FILE 2>&1 &
