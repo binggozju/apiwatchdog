@@ -16,6 +16,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -95,6 +96,46 @@ public class HttpClientUtils {
 			
 			throw new WatchdogException(ReturnCode.POST_HTTP_REQUEST_FAIL, ex.getMessage());
 		}
+	}
+	
+	public String sendPostRequest(String url, String jsonContent) throws WatchdogException {
+		HttpPost httpPost = new HttpPost(url);
+		
+		try {
+			httpPost.setEntity(new StringEntity(jsonContent));
+		} catch (UnsupportedEncodingException ex) {
+			//ex.printStackTrace();
+			throw new WatchdogException(ReturnCode.POST_HTTP_REQUEST_FAIL, ex.getMessage());
+		}
+
+		CloseableHttpResponse httpResponse = null;
+		try {
+			httpResponse = httpClient.execute(httpPost);
+			String respContent = EntityUtils.toString(httpResponse.getEntity());
+			
+			if (httpResponse != null) {
+				try {
+					httpResponse.close();
+				} catch (IOException ex) {
+					logger.error(ex.getMessage());
+				} 
+			}
+			
+			return respContent;
+			
+		} catch (IOException ex) {
+			//ex.printStackTrace();
+			if (httpResponse != null) {
+				try {
+					httpResponse.close();
+				} catch (IOException e) {
+					logger.error(e.getMessage());
+				} 
+			}
+			
+			throw new WatchdogException(ReturnCode.POST_HTTP_REQUEST_FAIL, ex.getMessage());
+		}
+		
 	}
 	
 	public String sendGetRequest(String url) throws WatchdogException {

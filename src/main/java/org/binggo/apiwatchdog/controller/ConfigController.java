@@ -27,7 +27,7 @@ import org.binggo.apiwatchdog.service.ConfigService;
  * <p>
  * The ConfigController provides some API for users to register and manage their API providers and API.
  * </p>
- * Here is he configuration information which can be managed as following:
+ * Here is the configuration information which can be managed as following:
  * <p>1. the detailed information about the API providers;</p>
  * <p>2. the API list and their alarm metrics for each API provider.</p>
  *

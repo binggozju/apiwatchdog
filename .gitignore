@@ -2,5 +2,9 @@
 .project
 .settings
 
+config/local.properties
+config/pre-release.properties
+config/production.properties
+
 target/*
 logs/*
