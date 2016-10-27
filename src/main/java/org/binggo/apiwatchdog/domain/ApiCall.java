@@ -1,5 +1,6 @@
 package org.binggo.apiwatchdog.domain;
 
+import java.util.Arrays;
 import java.util.Date;
 
 public class ApiCall {
@@ -131,5 +132,10 @@ public class ApiCall {
 
     public void setCallUuid(byte[] callUuid) {
         this.callUuid = callUuid;
+    }
+    
+    @Override
+    public String toString() {
+    	return Arrays.toString(getCallUuid());
     }
 }

@@ -9,12 +9,11 @@ import com.google.common.collect.Maps;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+
 import org.binggo.apiwatchdog.Processor;
+import org.binggo.apiwatchdog.WatchdogProcessor;
 import org.binggo.apiwatchdog.common.ReturnCode;
 import org.binggo.apiwatchdog.common.WatchdogException;
-import org.binggo.apiwatchdog.processor.alarm.AlarmProcessor;
-import org.binggo.apiwatchdog.processor.analyzer.AnalyzerProcessor;
-import org.binggo.apiwatchdog.processor.badcall.BadCallProcessor;
 
 @Component
 public class ProcessorFactory {
@@ -23,7 +22,7 @@ public class ProcessorFactory {
 	
 	private ApplicationContext context;
 	
-	private static Map<ProcessorType, Processor> processorMap;
+	private Map<ProcessorType, WatchdogProcessor> processorMap;
 	
 	@Autowired
 	public ProcessorFactory(ApplicationContext context) {
@@ -39,7 +38,7 @@ public class ProcessorFactory {
 	public Processor create(ProcessorType type) throws WatchdogException {
 		logger.info(String.format("Creating instance of processor [%s]", type.getProcessorClassName()));
 		
-		Class<Processor> processorClass = getClass(type);
+		Class<WatchdogProcessor> processorClass = getClass(type);
 		
 		try {
 			return processorClass.newInstance();
@@ -50,9 +49,9 @@ public class ProcessorFactory {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Class<Processor> getClass(ProcessorType type) throws WatchdogException {
+	public Class<WatchdogProcessor> getClass(ProcessorType type) throws WatchdogException {
 		try {
-			return (Class<Processor>) Class.forName(type.getProcessorClassName());
+			return (Class<WatchdogProcessor>) Class.forName(type.getProcessorClassName());
 		} catch (Exception ex) {
 			throw new WatchdogException(ReturnCode.FAIL_LOAD_PROCESSOR, 
 					String.format("Unable to load processor [%s]", type.getProcessorClassName()));
@@ -63,20 +62,21 @@ public class ProcessorFactory {
 	 * get all the available Processors from the ApplicationContext
 	 * @return
 	 */
-	public Map<ProcessorType, Processor> getAllProcessors() {
+	public Map<ProcessorType, WatchdogProcessor> getAllProcessors() {
 		if (processorMap == null) {
-			synchronized (processorMap) {
-				if (processorMap == null) {
-					processorMap = Maps.newHashMap();
-					
-					Processor alarmProcessor = (AlarmProcessor) context.getBean("alarmProcessor");
-					processorMap.put(ProcessorType.ALARM, alarmProcessor);
-					Processor analyzerProcessor = (AnalyzerProcessor) context.getBean("analyzerProcessor");
-					processorMap.put(ProcessorType.ANALYZER, analyzerProcessor);
-					Processor badCallProcessor = (BadCallProcessor) context.getBean("badCallProcessor");
-					processorMap.put(ProcessorType.BADCALL, badCallProcessor);
-				}	
-			}	
+			processorMap = Maps.newHashMap();
+			
+			WatchdogProcessor alarmProcessor = (WatchdogProcessor) context.getBean("alarmProcessor");
+			processorMap.put(ProcessorType.ALARM, alarmProcessor);
+			logger.debug("get AlarmProcessor");
+			
+			WatchdogProcessor analyzerProcessor = (WatchdogProcessor) context.getBean("analyzerProcessor");
+			processorMap.put(ProcessorType.ANALYZER, analyzerProcessor);
+			logger.debug("get AnalyzerProcessor");
+			
+			WatchdogProcessor badCallProcessor = (WatchdogProcessor) context.getBean("badCallProcessor");
+			processorMap.put(ProcessorType.BADCALL, badCallProcessor);
+			logger.debug("get BadCallProcessor");
 		}
 		return processorMap;
 	}

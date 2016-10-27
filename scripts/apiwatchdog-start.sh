@@ -30,7 +30,7 @@ JAVA_OPTS=
 echo "JAVA_OPTS: ${JAVA_OPTS}"
 
 # configuration of apiwatchdog
-APIWATCHDOG_OPTS=="--spring.config.location=config/apiwatchdog.properties,config/${ENV}.propert    ies"
+APIWATCHDOG_OPTS="--spring.config.location=config/apiwatchdog.properties,config/${ENV}.properties"
 echo "APIWATCHDOG_OPTS: $APIWATCHDOG_OPTS"
 if [ ! -f config/${ENV}.properties ]; then
 	echo "${ENV}.properties not found, exit"

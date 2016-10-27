@@ -3,7 +3,7 @@
 import sys
 from pykafka import kafkaClient
 
-topic_name = "apiwatchdog"
+topic_name = "apiwatchdog-apicall"
 kafka_hosts = "127.0.0.1:9092,127.0.0.1:9093"
 zk_hosts = "127.0.0.1:2181"
 

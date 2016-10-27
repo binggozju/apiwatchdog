@@ -4,7 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
-import org.binggo.apiwatchdog.WatchdogEvent;
+import org.binggo.apiwatchdog.Event;
 import org.binggo.apiwatchdog.domain.ApiCall;
 
 public class AlarmTemplate {
@@ -24,7 +24,7 @@ public class AlarmTemplate {
 	
 	private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	public static String getAlarmMessage(WatchdogEvent event) {
+	public static String getAlarmMessage(Event event) {
 		ApiCall apiCall = (ApiCall) event.getBody();
 		String apiCallUuid = Arrays.toString(apiCall.getCallUuid());
 		

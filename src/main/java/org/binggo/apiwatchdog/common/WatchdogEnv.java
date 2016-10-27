@@ -33,6 +33,7 @@ public class WatchdogEnv {
 	public Integer getInteger(String key, Integer defaultValue) {
 		Integer val = envConf.getProperty(key, Integer.class);
 		if (val != null) {
+			logger.info(String.format("the value of configuration item [%s]: %d", key, val));
 			return val;
 		} else {
 			logger.info(String.format("configuration item [%s] isn't configured, use its default value [%d] instead.", 
@@ -45,6 +46,7 @@ public class WatchdogEnv {
 	public Long getLong(String key, Long defaultValue) {
 		Long val = envConf.getProperty(key, Long.class);
 		if (val != null) {
+			logger.info(String.format("the value of configuration item [%s]: %d", key, val));
 			return val;
 		} else {
 			logger.info(String.format("configuration item [%s] isn't configured, use its default value [%d] instead.", 
@@ -55,7 +57,8 @@ public class WatchdogEnv {
 	
 	public String getString(String key, String defaultValue) {
 		String val = envConf.getProperty(key);
-		if (val == null) {
+		if (val != null) {
+			logger.info(String.format("the value of configuration item [%s]: %s",key, val));
 			return val;
 		} else {
 			logger.info(String.format("configuration item [%s] isn't configured, use its default value [%s] instead.", 

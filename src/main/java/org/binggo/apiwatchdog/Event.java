@@ -5,23 +5,22 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 /**
- * <p>WatchdogEvent is a message made up of the headers and the body.</p>
- * @author Administrator
- *
+ * <p>Event is a message made up of the headers and the body.</p>
+ * @author Binggo
  */
-public class WatchdogEvent {
+public class Event {
 	
 	private Map<String, String> headers;
 	
 	private Object body;
 	
-	public WatchdogEvent(Map<String, String> headers, Object body) {
+	public Event(Map<String, String> headers, Object body) {
 		this.headers = headers;
 		this.body = body;
 	}
 
-	public static WatchdogEvent buildEvent(Object body) {
-		return new WatchdogEvent(null, body);
+	public static Event buildEvent(Object body) {
+		return new Event(null, body);
 	}
 	
 	public void addHeader(String key, String value) {
@@ -45,5 +44,10 @@ public class WatchdogEvent {
 
 	public void setBody(Object body) {
 		this.body = body;
+	}
+	
+	@Override
+	public String toString() {
+		return body.toString();
 	}
 }

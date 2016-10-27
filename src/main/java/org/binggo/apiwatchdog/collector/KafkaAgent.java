@@ -3,7 +3,6 @@ package org.binggo.apiwatchdog.collector;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,32 +12,30 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
+import org.binggo.apiwatchdog.Collector;
+import org.binggo.apiwatchdog.Event;
+import org.binggo.apiwatchdog.TimerRunnable;
+import org.binggo.apiwatchdog.WatchdogRunner;
 import org.binggo.apiwatchdog.common.WatchdogEnv;
+import org.binggo.apiwatchdog.domain.ApiCall;
 
 /**
- * KafkaAgent work as a kafka consumer.
- * @author Administrator
- *
+ * KafkaAgent acts as a kafka consumer.
+ * @author Binggo
  */
 @Component
-public class KafkaAgent {
+public class KafkaAgent implements TimerRunnable {
 	
 	private static final Logger logger = LoggerFactory.getLogger(KafkaAgent.class);
-	
-	private static final Long FETCH_DATA_TIMEOUT = 10L;  // seconds
-	
-	private static final String KAFKA_SERVERS_CONFIG = "kafka.bootstrap.servers";
-	private static final String KAFKA_GROUP_CONFIG = "kafka.group.id";
-	private static final String KAFKA_CONSUMER_NUM_CONFIG = "kafka.consumer.num";
-	private static final String KAFKA_TOPIC_CONFIG = "kafka.topic";
-	
-	private static final Integer KAFKA_CONSUMER_NUM_DEFAULT = 2;
-	private static final String KAFKA_TOPIC_DEFAULT = "apiwatchdog-apicall";
 	
 	// primary kafka configuration
 	private String topic;
@@ -47,64 +44,74 @@ public class KafkaAgent {
 	private String kafkaServers;
 	
 	private Properties kafkaProperties;
+	private Map<Thread, ConsumerRunner> consumerThreadMap;
 	
-	private static final String THREAD_NAME_DEFAUTL = "Kafka-Consumer-Thread";
-	private Map<Thread, TopicConsumer> consumerThreadMap;
-	
-	@Autowired
 	private Collector collector;
+	private Gson gson;
 	
 	private Boolean initialized = false;
 	
 	@Autowired
-	public KafkaAgent(WatchdogEnv env) {
-		topic = env.getString(KAFKA_TOPIC_CONFIG, KAFKA_TOPIC_DEFAULT);
-		group = env.getString(KAFKA_GROUP_CONFIG, KafkaAgentUtils.GROUP_ID_DEFAULT);
-		consumerNum = env.getInteger(KAFKA_CONSUMER_NUM_CONFIG, KAFKA_CONSUMER_NUM_DEFAULT);
-		kafkaServers = env.getString(KAFKA_SERVERS_CONFIG, KafkaAgentUtils.BOOTSTRAP_SERVERS_DEFAULT);
+	public KafkaAgent(WatchdogEnv env, @Qualifier("simpleCollector") Collector collector) {
+		topic = env.getString(KafkaAgentHelper.KAFKA_TOPIC_CONFIG, KafkaAgentHelper.KAFKA_TOPIC_DEFAULT);
+		group = env.getString(KafkaAgentHelper.KAFKA_GROUP_CONFIG, KafkaAgentHelper.GROUP_ID_DEFAULT);
+		consumerNum = env.getInteger(KafkaAgentHelper.KAFKA_CONSUMER_NUM_CONFIG, KafkaAgentHelper.KAFKA_CONSUMER_NUM_DEFAULT);
+		kafkaServers = env.getString(KafkaAgentHelper.KAFKA_SERVERS_CONFIG, KafkaAgentHelper.BOOTSTRAP_SERVERS_DEFAULT);
 		
 		kafkaProperties = new Properties();
-
 		consumerThreadMap = Maps.newHashMap();
+		
+		this.collector = collector;
+		this.gson = new GsonBuilder().disableHtmlEscaping().create();
 	}
 	
 	private void initialize() {
 		if (!initialized) {
-			kafkaProperties = KafkaAgentUtils.getDefaultProperties();
-			kafkaProperties.put(KafkaAgentUtils.BOOTSTRAP_SERVERS_CONFIG, kafkaServers);
-			kafkaProperties.put(KafkaAgentUtils.GROUP_ID_CONFIG, group);
+			kafkaProperties = KafkaAgentHelper.getDefaultProperties();
+			kafkaProperties.put(KafkaAgentHelper.BOOTSTRAP_SERVERS_CONFIG, kafkaServers);
+			kafkaProperties.put(KafkaAgentHelper.GROUP_ID_CONFIG, group);
 			
 			initialized = true;
 		}
 	}
 	
-	//@Scheduled(fixedDelay = 5*1000)
-	public void runKafkaConsumer() {
-		if (consumerThreadMap.size() != 0) {
-			logger.info("The consumer threads have already exist");
+	//@Scheduled(initialDelay=1000, fixedDelay = 5*1000)
+	@Override
+	public void runTimerTask() {
+		if (consumerThreadMap.size() == 0) {
+			initialize();
+			for (int i = 0; i < consumerNum; i++) {
+				ConsumerRunner consumerRunner = new ConsumerRunner();
+				Thread consumerThread = new Thread(consumerRunner);
+				
+				consumerThread.setName(String.format("%s-%d",KafkaAgentHelper.CONSUMER_THREAD_NAME_DEFAUTL, i));
+				
+				consumerThreadMap.put(consumerThread, consumerRunner);
+				logger.info(String.format("start the kafka consumer thread [%s]", consumerThread.getName()));
+				consumerThread.start();
+			}
+			
 			return;
 		}
 		
-		initialize();	
-		for (int i = 0; i < consumerNum; i++) {
-			TopicConsumer topicConsumer = new TopicConsumer();
+		for (Map.Entry<Thread, ConsumerRunner> entry : consumerThreadMap.entrySet()) {
+			ConsumerRunner consumerRunner = entry.getValue();
+			Thread consumerThread = entry.getKey();
 			
-			Thread consumerThread = new Thread(topicConsumer);
-			consumerThread.setName(String.format("%s-%d",THREAD_NAME_DEFAUTL, i));
-			
-			consumerThreadMap.put(consumerThread, topicConsumer);
-			
-			consumerThread.start();
+			if (!consumerRunner.shouldStop() && !consumerThread.isAlive()) {
+				logger.warn(String.format("Thread [%s] is not alive, restart it", consumerThread.getName()));
+				consumerThread.start();
+			}
 		}
 	}
 	
 	public void stopAllConsumers() {
-		for (Map.Entry<Thread, TopicConsumer> entry : consumerThreadMap.entrySet()) {
-			TopicConsumer topicConsumer = entry.getValue();
+		for (Map.Entry<Thread, ConsumerRunner> entry : consumerThreadMap.entrySet()) {
+			ConsumerRunner consumerRunner = entry.getValue();
 			Thread consumerThread = entry.getKey();
 			
-			topicConsumer.setShouldStop(true);
-			topicConsumer.getKafkaConsumer().wakeup();
+			consumerRunner.setShouldStop(true);
+			consumerRunner.getKafkaConsumer().wakeup();
 			
 			consumerThread.interrupt();
 			while (consumerThread.isAlive()) {
@@ -118,43 +125,41 @@ public class KafkaAgent {
 		}
 	}
 	
-	
-	// one TopicConsumer per Thread
-	private class TopicConsumer implements Runnable {
+	private class ConsumerRunner extends WatchdogRunner {
 		
 		private KafkaConsumer<String, String> consumer;
-		private AtomicBoolean shouldStop = new AtomicBoolean(false);
 		
-		public TopicConsumer() {
+		public ConsumerRunner() {
 			consumer = new KafkaConsumer<String, String>(kafkaProperties);
 		}
-		
+
 		@Override
 		public void run() {
 			try {
 				consumer.subscribe(Arrays.asList(topic));
+				logger.info(String.format("Thread [%s] is running, start to consume message from kafka.", 
+					Thread.currentThread().getName()));
 				
-				while (!shouldStop.get()) {
-					ConsumerRecords<String, String> records = consumer.poll(FETCH_DATA_TIMEOUT*1000);
-					
+				while (!shouldStop()) {
+					ConsumerRecords<String, String> records = consumer.poll(KafkaAgentHelper.FETCH_DATA_TIMEOUT*1000);
 					for (ConsumerRecord<String, String> record : records) {
-						collector.collect(record.value());
+						try {
+							ApiCall apiCall = gson.fromJson(record.value(), ApiCall.class);
+							collector.collect(Event.buildEvent(apiCall));
+						} catch (JsonSyntaxException ex) {
+							logger.error(String.format("the api call of json format is invalid: %s", record.value()));
+							continue;
+						}	
 					}
 				}
-				
 			} catch (WakeupException ex) {
-				if (!shouldStop.get()) {
+				if (!shouldStop()) {
 					String threadName = Thread.currentThread().getName();
 					logger.warn(String.format("the kafka consumer thread [%s] has been shutdown.", threadName));
 				}
-				
 			} finally {
 				consumer.close();
 			}
-		}
-
-		public void setShouldStop(Boolean stop) {
-			shouldStop.set(stop);
 		}
 		
 		public KafkaConsumer<String, String> getKafkaConsumer() {

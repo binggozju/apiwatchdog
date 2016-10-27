@@ -2,11 +2,9 @@ package org.binggo.apiwatchdog;
 
 import java.util.List;
 
-import org.binggo.apiwatchdog.domain.ApiCall;
-
 /**
- * Processor can be used to consume the API call information in various ways.
- * @author Administrator
+ * Processor can be used to process the events in various ways.
+ * @author Binggo
  *
  */
 public interface Processor {
@@ -17,20 +15,24 @@ public interface Processor {
 	public void initialize();
 	
 	/**
-	 * processing of a single ApiCall
-	 * @param apiCall
+	 * take a single event
+	 * @param event
 	 */
-	void process(ApiCall apiCall);
+	void take(Event event);
 	
 	/**
-	 * processing of a batch of ApiCalls
-	 * @param apiCallList
+	 * take a batch of events
+	 * @param eventList
 	 */
-	void process(List<ApiCall> apiCallList);
+	void take(List<Event> eventList);
 	
 	/**
 	 * Perform any closing needed by the Processor.
 	 */
 	public void close();
 
+	/**
+	 * process all the events stored in the processor.
+	 */
+	void process();
 }
