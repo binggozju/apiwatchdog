@@ -1,6 +1,5 @@
 package org.binggo.apiwatchdog.processor.alarm;
 
-import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -19,6 +17,7 @@ import org.binggo.apiwatchdog.WatchdogProcessor;
 import org.binggo.apiwatchdog.common.WatchdogEnv;
 import org.binggo.apiwatchdog.common.WatchdogException;
 import org.binggo.apiwatchdog.config.Config;
+import org.binggo.apiwatchdog.domain.ApiCall;
 
 @Component("alarmProcessor")
 public class AlarmProcessor extends WatchdogProcessor {
@@ -55,7 +54,7 @@ public class AlarmProcessor extends WatchdogProcessor {
 		super.initialize();
 	}
 	
-	protected Boolean isPermitted(Event event) {
+	protected boolean isPermitted(Event event) {
 		return config.shouldAlarm(event);
 	}
 
@@ -75,7 +74,9 @@ public class AlarmProcessor extends WatchdogProcessor {
 			try {
 				Thread.sleep(AlarmConstants.IDLE_SLEEP_TIME*1000);
 			} catch (InterruptedException ex) {
-				logger.warn(ex.getMessage());
+				//ex.printStackTrace();
+				logger.warn("Thread [%s] has been interrupted while processing events. Exiting.", 
+						Thread.currentThread().getName());
 			}
 			return;
 		}
@@ -94,21 +95,30 @@ public class AlarmProcessor extends WatchdogProcessor {
 		String weixinReceivers = event.getHeaders().get(AlarmTemplate.WEIXIN_RECEIVERS_KEY);
 		String weixinContent = AlarmTemplate.getAlarmMessage(event);
 		
-		Map<String, String> postContentMap = Maps.newHashMap();
-		postContentMap.put("receivers", weixinReceivers);
-		postContentMap.put("content", weixinContent);
-		postContentMap.put("source", "apiwatchdog");
+		JsonObject jsonParams = new JsonObject();
+		jsonParams.addProperty("receivers", weixinReceivers);
+		jsonParams.addProperty("content", weixinContent);
+		jsonParams.addProperty("source", "apiwatchdog");
 		
 		try {
-			String responseContent = httpUtils.sendPostRequest(weixinSenderUrl, postContentMap);
+			String responseContent = httpUtils.sendPostRequest(weixinSenderUrl, jsonParams.toString());
 			
 			JsonObject jsonObj = jsonParser.parse(responseContent).getAsJsonObject();
+			if (!jsonObj.has("retcode")) {
+				logger.error(jsonObj.toString());
+				return;
+			}
+			
 			Integer retCode = jsonObj.get("retcode").getAsInt();
-			if (retCode != 0) {
-				//logger.error("");
-			}	
+			if (retCode == 0) {
+				logger.debug(String.format("send the weixin alarm message for api call [%s] successfully.", 
+						((ApiCall) event.getBody()).toString()));
+			} else {
+				logger.error(String.format("fail to send the weixin alarm message for api call [%s]", 
+						((ApiCall) event.getBody()).toString()));
+			}
 		} catch (WatchdogException ex) {
-			logger.error(String.format("fail to send the weixin message: %s", ex.getMessage()));
+			logger.error(String.format("fail to send the weixin alarm message: %s", ex.getMessage()));
 		}
 	}
 	
@@ -121,19 +131,28 @@ public class AlarmProcessor extends WatchdogProcessor {
 		String mailReceivers = event.getHeaders().get(AlarmTemplate.MAIL_RECEIVERS_KEY);
 		String mailContent = AlarmTemplate.getAlarmMessage(event);
 		
-		Map<String, String> postContentMap = Maps.newHashMap();
-		postContentMap.put("subject", "API调用监控实时告警");
-		postContentMap.put("receivers", mailReceivers);
-		postContentMap.put("content", mailContent);
-		postContentMap.put("source", "apiwatchdog");
+		JsonObject jsonParams = new JsonObject();
+		jsonParams.addProperty("subject", "API调用监控实时告警");
+		jsonParams.addProperty("receivers", mailReceivers);
+		jsonParams.addProperty("content", mailContent);
+		jsonParams.addProperty("source", "apiwatchdog");
 		
 		try {
-			String responseContent = httpUtils.sendPostRequest(mailSenderUrl, postContentMap);
+			String responseContent = httpUtils.sendPostRequest(mailSenderUrl, jsonParams.toString());
 			
 			JsonObject jsonObj = jsonParser.parse(responseContent).getAsJsonObject();
+			if (!jsonObj.has("retcode")) {
+				logger.error(jsonObj.toString());
+				return;
+			}
+			
 			Integer retCode = jsonObj.get("retcode").getAsInt();
-			if (retCode != 0) {
-				//logger.error("");
+			if (retCode == 0) {
+				logger.debug(String.format("send the mail alarm message for api call [%s] successfully.", 
+						((ApiCall) event.getBody()).toString()));
+			} else {
+				logger.error(String.format("fail to send the mail alarm message for api call [%s]", 
+						((ApiCall) event.getBody()).toString()));
 			}	
 			
 		} catch (WatchdogException ex) {
@@ -159,12 +178,13 @@ public class AlarmProcessor extends WatchdogProcessor {
 			return;
 		}
 		
+		// create the alarm processor threads
 		if (runnerMap.size() == 0) {
 			ProcessorRunner alarmRunner = new ProcessorRunner(this);
 			for (int i = 0; i < processorNum; i++) {
 				Thread alarmThread = new Thread(alarmRunner);
 				
-				alarmThread.setName(String.format("%s-%d", AlarmConstants.PROCESSOR_NAME, i));
+				alarmThread.setName(String.format("%s-%d", getName(), i));
 				
 				runnerMap.put(alarmThread, alarmRunner);
 				logger.info(String.format("start the alarm processor thread [%s]", alarmThread.getName()));
@@ -174,15 +194,8 @@ public class AlarmProcessor extends WatchdogProcessor {
 			return;
 		}
 		
-		for (Map.Entry<Thread, ProcessorRunner> entry : runnerMap.entrySet()) {
-			ProcessorRunner alarmRunner = entry.getValue();
-			Thread alarmThread = entry.getKey();
-			
-			if (!alarmRunner.shouldStop() && !alarmThread.isAlive()) {
-				logger.warn(String.format("Thread [%s] is not alive, restart it", alarmThread.getName()));
-				alarmThread.start();
-			}
-		}
+		// clear the terminated alarm processor threads
+		checkProcessorHealth();
 	}
 	
 }

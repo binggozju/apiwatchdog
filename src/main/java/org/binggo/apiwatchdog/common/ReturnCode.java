@@ -17,13 +17,16 @@ public enum ReturnCode {
 	FAIL_CREATE_PROCESSOR (81, "fail to create the processor"),
 	FAILURE (99, "fail"),
 	
-	// return code for collector module [100, 200)
-	COLLECT_QUEUE_FULL (100, "collect queue is full"),
-	INVALID_EVENT (101, "invalid event"),
+	// return code for kafka agent [100, 200)
+	FAIL_CONSTRUCT_CONSUMER (100, "fail to construct the kafka consumer"),
 	
-	// return code for alarm module [200, 300)
-	POST_HTTP_REQUEST_FAIL (200, "fail to send the post http request"),
-	GET_HTTP_REQUEST_FAIL (201, "fail to send the get http request");
+	// return code for collector module [200, 300)
+	COLLECT_QUEUE_FULL (200, "collect queue is full"),
+	INVALID_EVENT (201, "invalid event"),
+	
+	// return code for alarm processor module [300, 400)
+	POST_HTTP_REQUEST_FAIL (300, "fail to send the post http request"),
+	GET_HTTP_REQUEST_FAIL (301, "fail to send the get http request");
 	
 	
 	// return code for processor module

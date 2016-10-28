@@ -1,13 +1,18 @@
 package org.binggo.apiwatchdog.domain;
 
-import java.util.Arrays;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class ApiCall {
     private Integer apiId;
+    
+    private String callUuid;
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date requestTime;
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date responseTime;
 
     private String httpReponseCode;
@@ -27,8 +32,6 @@ public class ApiCall {
     private String requestBody;
 
     private String responseBody;
-
-    private byte[] callUuid;
 
     public Integer getApiId() {
         return apiId;
@@ -126,16 +129,16 @@ public class ApiCall {
         this.responseBody = responseBody == null ? null : responseBody.trim();
     }
 
-    public byte[] getCallUuid() {
+    public String getCallUuid() {
         return callUuid;
     }
 
-    public void setCallUuid(byte[] callUuid) {
+    public void setCallUuid(String callUuid) {
         this.callUuid = callUuid;
     }
     
     @Override
     public String toString() {
-    	return Arrays.toString(getCallUuid());
+    	return callUuid;
     }
 }

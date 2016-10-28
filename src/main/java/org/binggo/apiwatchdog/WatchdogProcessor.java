@@ -1,7 +1,9 @@
 package org.binggo.apiwatchdog;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -37,6 +39,7 @@ public abstract class WatchdogProcessor implements Processor, TimerRunnable {
 		if (!isPermitted(event)) {
 			return;
 		}
+		
 		// must not block here
 		if (!processQueue.offer(event)) {
 			logger.error(String.format("fail to offer the event [%s] to the queue of %s", 
@@ -61,7 +64,7 @@ public abstract class WatchdogProcessor implements Processor, TimerRunnable {
 	 * @param event
 	 * @return
 	 */
-	protected abstract Boolean isPermitted(Event event);
+	protected abstract boolean isPermitted(Event event);
 	
 	public void stopAllRunners() {
 		if (runnerMap == null) {
@@ -92,6 +95,35 @@ public abstract class WatchdogProcessor implements Processor, TimerRunnable {
 	protected void setInitialized(Boolean b) {
 		initialized.set(b);
 	}
+	
+	/**
+	 * <p>check all the processor threads in runnerMap.</p>
+	 * <p>clear the terminated threads, and restart them with new threads.</p>
+	 */
+	protected void checkProcessorHealth() {
+		Map<Thread, ProcessorRunner> cacheRunnerMap = Maps.newHashMap();
+		
+		Iterator<Entry<Thread, ProcessorRunner>> it = runnerMap.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<Thread, ProcessorRunner> entry = it.next();
+			ProcessorRunner processorRunner = entry.getValue();
+			Thread processorThread = entry.getKey();
+			
+			if (!processorRunner.shouldStop() && !processorThread.isAlive()) {
+				logger.warn(String.format("Thread [%s] is not alive, restart it", processorThread.getName()));
+				
+				// create a new processor thread, and start it
+				Thread newProcessorThread = new Thread(processorRunner);
+				newProcessorThread.setName(processorThread.getName());
+				cacheRunnerMap.put(newProcessorThread, processorRunner);
+				newProcessorThread.start();
+				
+				it.remove();
+			}
+		}
+		runnerMap.putAll(cacheRunnerMap);
+	}
+	
 	
 	public String getName() {
 		return name;

@@ -68,6 +68,8 @@ public class SimpleCollector extends WatchdogCollector {
 				Thread.sleep(CollectorConstants.IDLE_SLEEP_TIME*1000);
 			} catch (InterruptedException ex) {
 				//ex.printStackTrace();
+				logger.warn("Thread [%s] has been interrupted while dispatching events. Exiting.", 
+						Thread.currentThread().getName());
 			}
 			return;
 		}
@@ -92,15 +94,19 @@ public class SimpleCollector extends WatchdogCollector {
 		
 		if (!collectorRunner.shouldStop() && !collectorThread.isAlive()) {
 			logger.warn(String.format("Thread [%s] is not alive, restart it", collectorThread.getName()));
-			collectorThread.start();	
-		} 
+			
+			// create a new collector thread, and start it
+			collectorThread = new Thread(collectorRunner);
+			collectorThread.setName(CollectorConstants.COLLECTOR_NAME);
+			collectorThread.start();
+		}
 	}
 	
 	public void stopCollectorRunner() {
 		if (collectorThread != null) {
 			collectorRunner.setShouldStop(true);
-			collectorThread.interrupt();
 			
+			collectorThread.interrupt();
 			while (collectorThread.isAlive()) {
 				try {
 					collectorThread.join(500);

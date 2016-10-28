@@ -39,7 +39,9 @@ public class FacadeProcessor implements Processor {
 	public void take(Event event) {
 		for(Map.Entry<ProcessorType, WatchdogProcessor> entry : processors.entrySet()) {
 			Processor processor = entry.getValue();
-			processor.take(event);
+			
+			Event replicaEvent = Event.buildEvent(event.getBody());
+			processor.take(replicaEvent);
 		}
 	}
 

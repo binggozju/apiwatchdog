@@ -1,17 +1,10 @@
 package org.binggo.apiwatchdog.processor.alarm;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.http.HttpHost;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -20,7 +13,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import org.springframework.stereotype.Component;
@@ -53,60 +45,12 @@ public class HttpClientUtils {
 				.build();
 	}
 	
-	public String sendPostRequest(String url, Map<String, String> content) throws WatchdogException {
-		HttpPost httpPost = new HttpPost(url);
-		
-		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		for (Map.Entry<String, String> entry : content.entrySet()) {
-			NameValuePair pair = new BasicNameValuePair(entry.getKey(), entry.getValue());
-			params.add(pair);
-		}
-		
-		try {
-			httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-		} catch (UnsupportedEncodingException ex) {
-			//ex.printStackTrace();
-			throw new WatchdogException(ReturnCode.POST_HTTP_REQUEST_FAIL, ex.getMessage());
-		}
-		
-		CloseableHttpResponse httpResponse = null;
-		try {
-			httpResponse = httpClient.execute(httpPost);
-			String respContent = EntityUtils.toString(httpResponse.getEntity());
-			
-			if (httpResponse != null) {
-				try {
-					httpResponse.close();
-				} catch (IOException ex) {
-					logger.error(ex.getMessage());
-				} 
-			}
-			
-			return respContent;
-			
-		} catch (IOException ex) {
-			//ex.printStackTrace();
-			if (httpResponse != null) {
-				try {
-					httpResponse.close();
-				} catch (IOException e) {
-					logger.error(e.getMessage());
-				} 
-			}
-			
-			throw new WatchdogException(ReturnCode.POST_HTTP_REQUEST_FAIL, ex.getMessage());
-		}
-	}
-	
 	public String sendPostRequest(String url, String jsonContent) throws WatchdogException {
 		HttpPost httpPost = new HttpPost(url);
+		httpPost.setHeader("Accept", "application/json");
+		httpPost.setHeader("Content-type", "application/json; charset=utf-8");
 		
-		try {
-			httpPost.setEntity(new StringEntity(jsonContent));
-		} catch (UnsupportedEncodingException ex) {
-			//ex.printStackTrace();
-			throw new WatchdogException(ReturnCode.POST_HTTP_REQUEST_FAIL, ex.getMessage());
-		}
+		httpPost.setEntity(new StringEntity(jsonContent, "utf-8"));
 
 		CloseableHttpResponse httpResponse = null;
 		try {

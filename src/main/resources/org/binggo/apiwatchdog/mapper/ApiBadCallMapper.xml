@@ -3,7 +3,7 @@
 <mapper namespace="org.binggo.apiwatchdog.mapper.ApiBadCallMapper" >
   <resultMap id="BaseResultMap" type="org.binggo.apiwatchdog.domain.ApiCall" >
     <result column="api_id" property="apiId" jdbcType="INTEGER" />
-    <result column="call_uuid" property="callUuid" jdbcType="VARBINARY" />
+    <result column="call_uuid" property="callUuid" jdbcType="VARCHAR" />
     <result column="request_time" property="requestTime" jdbcType="TIMESTAMP" />
     <result column="response_time" property="responseTime" jdbcType="TIMESTAMP" />
     <result column="http_reponse_code" property="httpReponseCode" jdbcType="VARCHAR" />
@@ -24,7 +24,7 @@
       	source_service, source_host, dest_service, 
       	dest_host, request_body, response_body
      ) values (
-     	#{apiId,jdbcType=INTEGER}, #{callUuid,jdbcType=VARBINARY}, #{requestTime,jdbcType=TIMESTAMP}, #{responseTime,jdbcType=TIMESTAMP}, 
+     	#{apiId,jdbcType=INTEGER}, #{callUuid,jdbcType=VARCHAR}, #{requestTime,jdbcType=TIMESTAMP}, #{responseTime,jdbcType=TIMESTAMP}, 
       	#{httpReponseCode,jdbcType=VARCHAR}, #{apiReturnCode,jdbcType=VARCHAR}, #{apiReturnMessage,jdbcType=VARCHAR}, 
       	#{sourceService,jdbcType=VARCHAR}, #{sourceHost,jdbcType=VARCHAR}, #{destService,jdbcType=VARCHAR}, 
       	#{destHost,jdbcType=VARCHAR}, #{requestBody,jdbcType=VARCHAR}, #{responseBody,jdbcType=VARCHAR}

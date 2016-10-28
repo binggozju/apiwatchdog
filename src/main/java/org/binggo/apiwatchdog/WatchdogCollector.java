@@ -48,7 +48,6 @@ public abstract class WatchdogCollector implements Collector, TimerRunnable {
 			}
 			
 			logger.info(String.format("Thread [%s] has been stoped.", Thread.currentThread().getName()));
-			
 		}
 		
 	}

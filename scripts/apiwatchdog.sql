@@ -7,9 +7,9 @@ DROP TABLE IF EXISTS `api_bad_call`;
 CREATE TABLE `api_bad_call` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `api_id` int(10) unsigned NOT NULL COMMENT 'api的id',
-  `call_uuid` varbinary(16) NOT NULL COMMENT 'api调用的uuid',
+  `call_uuid` varchar(40) NOT NULL COMMENT 'api调用的uuid',
   `request_time` datetime NOT NULL COMMENT '发起request的时间',
-  `response_time` datetime DEFAULT NULL  COMMENT '收到response的时间',
+  `response_time` datetime DEFAULT NULL COMMENT '收到response的时间',
   `http_reponse_code` varchar(3) DEFAULT '' COMMENT 'response中的http响应码',
   `api_return_code` varchar(12) DEFAULT '' COMMENT 'response中的api返回码',
   `api_return_message` varchar(128) DEFAULT '' COMMENT 'response中的api返回码的解释文本',
@@ -43,7 +43,7 @@ CREATE TABLE `api_item` (
   `created_time` datetime NOT NULL,
   `last_updated_time` datetime NOT NULL,
   PRIMARY KEY (`api_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Table structure for api_provider
@@ -61,7 +61,7 @@ CREATE TABLE `api_provider` (
   `created_time` datetime NOT NULL,
   `last_updated_time` datetime NOT NULL,
   PRIMARY KEY (`provider_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Table structure for api_stat_data

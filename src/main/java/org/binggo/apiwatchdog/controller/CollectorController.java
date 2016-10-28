@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-
 import org.binggo.apiwatchdog.Collector;
 import org.binggo.apiwatchdog.Event;
 import org.binggo.apiwatchdog.common.WatchdogException;
@@ -38,8 +36,7 @@ public class CollectorController {
 	
 	@RequestMapping(method=RequestMethod.POST, value="/collect")
 	public WatchdogResponse receiveApiCall(@RequestBody ApiCall apiCall) {
-		String callUuid = Arrays.toString(apiCall.getCallUuid());
-		logger.debug(String.format("receive an api call: %s", callUuid));
+		logger.debug(String.format("receive an api call: %s", apiCall.getCallUuid()));
 		
 		try {
 			collector.collect(Event.buildEvent(apiCall));

@@ -1,7 +1,9 @@
 package org.binggo.apiwatchdog.collector;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -25,7 +27,9 @@ import org.binggo.apiwatchdog.Collector;
 import org.binggo.apiwatchdog.Event;
 import org.binggo.apiwatchdog.TimerRunnable;
 import org.binggo.apiwatchdog.WatchdogRunner;
+import org.binggo.apiwatchdog.common.ReturnCode;
 import org.binggo.apiwatchdog.common.WatchdogEnv;
+import org.binggo.apiwatchdog.common.WatchdogException;
 import org.binggo.apiwatchdog.domain.ApiCall;
 
 /**
@@ -78,31 +82,51 @@ public class KafkaAgent implements TimerRunnable {
 	//@Scheduled(initialDelay=1000, fixedDelay = 5*1000)
 	@Override
 	public void runTimerTask() {
+		// create the consumer threads
 		if (consumerThreadMap.size() == 0) {
 			initialize();
 			for (int i = 0; i < consumerNum; i++) {
-				ConsumerRunner consumerRunner = new ConsumerRunner();
-				Thread consumerThread = new Thread(consumerRunner);
-				
-				consumerThread.setName(String.format("%s-%d",KafkaAgentHelper.CONSUMER_THREAD_NAME_DEFAUTL, i));
-				
-				consumerThreadMap.put(consumerThread, consumerRunner);
-				logger.info(String.format("start the kafka consumer thread [%s]", consumerThread.getName()));
-				consumerThread.start();
+				try {
+					ConsumerRunner consumerRunner = new ConsumerRunner();
+					Thread consumerThread = new Thread(consumerRunner);
+					
+					consumerThread.setName(String.format("%s-%d",KafkaAgentHelper.CONSUMER_THREAD_NAME_DEFAUTL, i));
+					
+					consumerThreadMap.put(consumerThread, consumerRunner);
+					logger.info(String.format("start the kafka consumer thread [%s]", consumerThread.getName()));
+					consumerThread.start();
+					
+				} catch (WatchdogException ex) {
+					logger.error(String.format("%s. check your kafka configuarion information again please.", ex.getMessage()));
+					return;
+				}
 			}
 			
 			return;
 		}
 		
-		for (Map.Entry<Thread, ConsumerRunner> entry : consumerThreadMap.entrySet()) {
+		// clear the terminated threads
+		Map<Thread, ConsumerRunner> cacheMap = Maps.newHashMap();
+		
+		Iterator<Entry<Thread, ConsumerRunner>> it = consumerThreadMap.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<Thread, ConsumerRunner> entry = it.next();
 			ConsumerRunner consumerRunner = entry.getValue();
 			Thread consumerThread = entry.getKey();
 			
 			if (!consumerRunner.shouldStop() && !consumerThread.isAlive()) {
 				logger.warn(String.format("Thread [%s] is not alive, restart it", consumerThread.getName()));
-				consumerThread.start();
+				
+				// create a new consumer thread, and start it
+				Thread newConsumerThread = new Thread(consumerRunner);
+				newConsumerThread.setName(consumerThread.getName());
+				cacheMap.put(newConsumerThread, consumerRunner);
+				newConsumerThread.start();
+				
+				it.remove();
 			}
 		}
+		consumerThreadMap.putAll(cacheMap);
 	}
 	
 	public void stopAllConsumers() {
@@ -130,7 +154,11 @@ public class KafkaAgent implements TimerRunnable {
 		private KafkaConsumer<String, String> consumer;
 		
 		public ConsumerRunner() {
-			consumer = new KafkaConsumer<String, String>(kafkaProperties);
+			try {
+				consumer = new KafkaConsumer<String, String>(kafkaProperties);
+			} catch (Exception ex) {
+				throw new WatchdogException(ReturnCode.FAIL_CONSTRUCT_CONSUMER, ex.getMessage());
+			}
 		}
 
 		@Override

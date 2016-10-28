@@ -35,9 +35,9 @@ public class AnalyzerProcessor extends WatchdogProcessor {
 	}
 
 	@Override
-	protected Boolean isPermitted(Event event) {
+	protected boolean isPermitted(Event event) {
 		// TODO Auto-generated method stub
-		return null;
+		return false;
 	}
 	
 

@@ -1,6 +1,5 @@
 package org.binggo.apiwatchdog.processor.badcall;
 
-import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
@@ -54,7 +53,7 @@ public class BadCallProcessor extends WatchdogProcessor {
 		super.initialize();
 	}
 
-	protected Boolean isPermitted(Event event) {
+	protected boolean isPermitted(Event event) {
 		return isBadCall((ApiCall) event.getBody());
 	}
 	
@@ -94,7 +93,9 @@ public class BadCallProcessor extends WatchdogProcessor {
 			try {
 				Thread.sleep(IDLE_SLEEP_TIME*1000);
 			} catch (InterruptedException ex) {
-				logger.warn(ex.getMessage());
+				//ex.printStackTrace();
+				logger.warn("Thread [%s] has been interrupted while processing events. Exiting.", 
+						Thread.currentThread().getName());
 			}
 			return;
 		}
@@ -115,13 +116,14 @@ public class BadCallProcessor extends WatchdogProcessor {
 			return;
 		}
 		
+		// create the bad call processor threads
 		if (runnerMap.size() == 0) {
 			ProcessorRunner badCallRunner = new ProcessorRunner(this);
 			
 			for (int i = 0; i < PROCESSOR_THREAD_NUM; i++) {
 				Thread badCallThread = new Thread(badCallRunner);
 				
-				badCallThread.setName(String.format("%s-%d", PROCESSOR_NAME, i));
+				badCallThread.setName(String.format("%s-%d", getName(), i));
 				
 				runnerMap.put(badCallThread, badCallRunner);
 				logger.info(String.format("start the bad call processor thread [%s]", badCallThread.getName()));
@@ -131,16 +133,8 @@ public class BadCallProcessor extends WatchdogProcessor {
 			return;
 		}
 		
-		for (Map.Entry<Thread, ProcessorRunner> entry : runnerMap.entrySet()) {
-			ProcessorRunner badCallRunner = entry.getValue();
-			Thread badCallThread = entry.getKey();
-			
-			if (!badCallRunner.shouldStop() && !badCallThread.isAlive()) {
-				logger.warn(String.format("Thread [%s] is not alive, restart it", badCallThread.getName()));
-				badCallThread.start();
-			}
-			
-		}
+		// clear the terminated bad call processor threads
+		checkProcessorHealth();
 	}
 
 }
