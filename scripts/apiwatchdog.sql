@@ -43,7 +43,7 @@ CREATE TABLE `api_item` (
   `created_time` datetime NOT NULL,
   `last_updated_time` datetime NOT NULL,
   PRIMARY KEY (`api_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Table structure for api_provider
@@ -61,7 +61,7 @@ CREATE TABLE `api_provider` (
   `created_time` datetime NOT NULL,
   `last_updated_time` datetime NOT NULL,
   PRIMARY KEY (`provider_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Table structure for api_stat_data
