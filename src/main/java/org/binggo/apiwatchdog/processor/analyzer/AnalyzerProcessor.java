@@ -8,8 +8,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.TimeUnit;
-
 import org.binggo.apiwatchdog.Event;
 import org.binggo.apiwatchdog.WatchdogProcessor;
 import org.binggo.apiwatchdog.common.WatchdogEnv;
@@ -25,23 +23,25 @@ public class AnalyzerProcessor extends WatchdogProcessor {
 
 	private static final Logger logger = LoggerFactory.getLogger(AnalyzerProcessor.class);
 	
-	private StringRedisTemplate stringRedisTemplate;
+	private StringRedisTemplate template;
 	
+	@SuppressWarnings("unused")
 	private Integer keysExpireTime;
 
 	@Autowired
-	public AnalyzerProcessor(WatchdogEnv env, StringRedisTemplate stringRedisTemplate) {
+	public AnalyzerProcessor(WatchdogEnv env, StringRedisTemplate template) {
 		super(AnalyzerUtils.PROCESSOR_NAME);
 		
 		capacity = env.getInteger(AnalyzerUtils.QUEUE_CAPACITY_CONFIG, AnalyzerUtils.QUEUE_CAPACITY_DEFAULT);
 		processorNum = env.getInteger(AnalyzerUtils.ANALYZER_THREAD_NUM_CONFIG, AnalyzerUtils.ANALYZER_THREAD_NUM_DEFAULT);
 		keysExpireTime = env.getInteger(AnalyzerUtils.REDIS_KEYS_EXPIRE_CONFIG, AnalyzerUtils.REDIS_KEYS_EXPIRE_DEFAULT);
 		
-		this.stringRedisTemplate = stringRedisTemplate;
+		this.template = template;
 	}
 	
 	@Override
 	protected void doInitialize() {
+		//template.setEnableTransactionSupport(true);
 		// nothing to do
 	}
 	
@@ -67,20 +67,37 @@ public class AnalyzerProcessor extends WatchdogProcessor {
 		}
 		String redisKeyName = AnalyzerUtils.getRedisKeyName(apiCall.getApiId(), apiCall.getRequestTime());
 		
-		// create the redis key and set the expire time
-		stringRedisTemplate.watch(redisKeyName);
-		stringRedisTemplate.multi();
-		if(!stringRedisTemplate.hasKey(redisKeyName)) {
-			stringRedisTemplate.opsForHash().putAll(redisKeyName, AnalyzerUtils.getDefaultHash());
-			stringRedisTemplate.expire(redisKeyName, keysExpireTime, TimeUnit.MINUTES);
-		} 
-		stringRedisTemplate.exec();  // check the result, if fail, the key has exists.
+		// update the statistical information in current time slice
+		template.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_COUNT_TOTAL, 1);
 		
-		// update the statiscal information
-		stringRedisTemplate.multi();
-		stringRedisTemplate.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_COUNT_TOTAL, 1);
-		// TODO
-		stringRedisTemplate.exec();	
+		// Deprecated: cann't guarantee that the expire command must be executed in concurrent environment.
+		// we adopt the manual way to remove the old keys in redis.
+		/*int current_total = (int) template.boundHashOps(redisKeyName).get(AnalyzerUtils.KEY_COUNT_TOTAL);
+		if (current_total == 1) {
+			template.expire(redisKeyName, keysExpireTime, TimeUnit.MINUTES);
+		}*/
+		
+		if (apiCall.getResponseTime() == null) {
+			template.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_COUNT_TIMEOUT, 1);
+		} else {
+			int respTime = (int)(apiCall.getResponseTime().getTime() - apiCall.getRequestTime().getTime())/1000;
+			if (respTime < 0) {
+				logger.error(String.format("response time error: response time is less than request time in Api call [%s]", 
+						apiCall.getCallUuid()));
+				template.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_COUNT_TOTAL, -1);
+				return;
+			}
+			
+			template.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_RESPTIME_TOTAL, respTime);
+			template.boundHashOps(redisKeyName).increment(AnalyzerUtils.getRespTimeKey(respTime), 1);
+			
+			if (!apiCall.getHttpReponseCode().equals("200")) {
+				template.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_COUNT_NOT200, 1);
+			} else if (!apiCall.getApiReturnCode().equals("0")) {
+				template.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_200_NOT0, 1);
+			}
+			
+		}
 	}
 
 	@Scheduled(initialDelay=1000, fixedDelay = 3000)

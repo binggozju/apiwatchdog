@@ -3,9 +3,6 @@ package org.binggo.apiwatchdog.processor.analyzer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
-
-import com.google.common.collect.Maps;
 
 public class AnalyzerUtils {
 	// configuration name and its default value
@@ -41,6 +38,22 @@ public class AnalyzerUtils {
 	public static final String KEY_RESPTIME_11S_12S = "resptime_11s_12s";
 	public static final String KEY_RESPTIME_12S_MAX = "resptime_12s_max";
 	
+	public static final String[] RESPTIME_KEYS = new String[] {
+			KEY_RESPTIME_0S_1S,
+			KEY_RESPTIME_1S_2S,
+			KEY_RESPTIME_2S_3S,
+			KEY_RESPTIME_3S_4S,
+			KEY_RESPTIME_4S_5S,
+			KEY_RESPTIME_5S_6S,
+			KEY_RESPTIME_6S_7S,
+			KEY_RESPTIME_7S_8S,
+			KEY_RESPTIME_8S_9S,
+			KEY_RESPTIME_9S_10S,
+			KEY_RESPTIME_10S_11S,
+			KEY_RESPTIME_11S_12S,
+			KEY_RESPTIME_12S_MAX
+		};
+	
 	
 	// length of the time slice for analysis and statistics
 	private static final Integer TIME_SLICE_LENGTH = 5*60*1000; // 5 minutes
@@ -60,33 +73,12 @@ public class AnalyzerUtils {
 		return redisKeyName;
 	}
 	
-	/**
-	 * generate a default hash in redis
-	 * @return
-	 */
-	public static Map<String, Integer> getDefaultHash() {
-		Map<String, Integer> defaultHash = Maps.newHashMap();
-		
-		defaultHash.put(KEY_COUNT_TOTAL, 0);
-		defaultHash.put(KEY_COUNT_TIMEOUT, 0);
-		defaultHash.put(KEY_COUNT_NOT200, 0);
-		defaultHash.put(KEY_200_NOT0, 0);
-		defaultHash.put(KEY_RESPTIME_TOTAL, 0);
-		defaultHash.put(KEY_RESPTIME_0S_1S, 0);
-		defaultHash.put(KEY_RESPTIME_1S_2S, 0);
-		defaultHash.put(KEY_RESPTIME_2S_3S, 0);
-		defaultHash.put(KEY_RESPTIME_3S_4S, 0);
-		defaultHash.put(KEY_RESPTIME_4S_5S, 0);
-		defaultHash.put(KEY_RESPTIME_5S_6S, 0);
-		defaultHash.put(KEY_RESPTIME_6S_7S, 0);
-		defaultHash.put(KEY_RESPTIME_7S_8S, 0);
-		defaultHash.put(KEY_RESPTIME_8S_9S, 0);
-		defaultHash.put(KEY_RESPTIME_9S_10S, 0);
-		defaultHash.put(KEY_RESPTIME_10S_11S, 0);
-		defaultHash.put(KEY_RESPTIME_11S_12S, 0);
-		defaultHash.put(KEY_RESPTIME_12S_MAX, 0);
-		
-		return defaultHash;
+	public static String getRespTimeKey(int respTime) {
+		if (respTime < RESPTIME_KEYS.length - 1) {
+			return RESPTIME_KEYS[respTime];
+		} else {
+			return RESPTIME_KEYS[RESPTIME_KEYS.length - 1];
+		}
 	}
 
 }

@@ -80,36 +80,44 @@ public class Config {
 		String phoneReceivers = providerConfMap.get(providerId).getPhoneReceivers();
 		event.addHeader(AlarmTemplate.SMS_RECEIVERS_KEY, phoneReceivers);
 		
+		// check provider's state
 		if (providerConfMap.get(providerId).getState() == 0) {
 			confRWLock.readLock().unlock();
 			return false;
 		}
+		// check API's state
 		if (apiConfMap.get(apiId).getState() == 0) {
 			confRWLock.readLock().unlock();
 			return false;
 		}
-		
 		// check whether there is a response
 		if (apiCall.getResponseTime() == null) {
-			event.addHeader(AlarmTemplate.ALARM_REASON_KEY, AlarmTemplate.ALARM_REASON_NO_RESPONSE);
-			confRWLock.readLock().unlock();
-			return true;
+			if (apiConfMap.get(apiId).getMetricResptimeThreshold() == 0) {
+				confRWLock.readLock().unlock();
+				return false;
+			} else {
+				event.addHeader(AlarmTemplate.ALARM_REASON_KEY, AlarmTemplate.ALARM_REASON_NO_RESPONSE);
+				confRWLock.readLock().unlock();
+				return true;
+			}
 		}
 		// check the response time
 		int timeDelta = (int)(apiCall.getResponseTime().getTime() - apiCall.getRequestTime().getTime())/1000;
 		if (timeDelta >= apiConfMap.get(apiId).getMetricResptimeThreshold()) {
-			event.addHeader(AlarmTemplate.ALARM_REASON_KEY, AlarmTemplate.ALARM_REASON_EXCEED_THRESHOLD);
-			confRWLock.readLock().unlock();
-			return true;
+			if (apiConfMap.get(apiId).getMetricResptimeThreshold() != 0) {
+				event.addHeader(AlarmTemplate.ALARM_REASON_KEY, AlarmTemplate.ALARM_REASON_EXCEED_THRESHOLD);
+				confRWLock.readLock().unlock();
+				return true;
+			}	
 		}
 		// check the response code of HTTP
-		if (apiCall.getHttpReponseCode() != "200" && apiConfMap.get(apiId).getMetricNot200() !=0) {
+		if (!apiCall.getHttpReponseCode().equals("200") && apiConfMap.get(apiId).getMetricNot200() != 0) {
 			event.addHeader(AlarmTemplate.ALARM_REASON_KEY, AlarmTemplate.ALARM_REASON_NOT_HTTP200);
 			confRWLock.readLock().unlock();
 			return true;
 		}
 		// check the return code
-		/*if (apiCall.getApiReturnCode() != "0" && apiConfMap.get(apiId).getMetric200Not0() !=0) {
+		/*if (!apiCall.getApiReturnCode().equals("0") && apiConfMap.get(apiId).getMetric200Not0() != 0) {
 			event.addHeader(AlarmTemplate.ALARM_REASON_KEY, AlarmTemplate.ALARM_REASON_NOT_RETCODE0);
 			confRWLock.readLock().unlock();
 			return true;
