@@ -16,23 +16,45 @@ public abstract class WatchdogProcessor implements Processor, TimerRunnable {
 	
 	private static final Logger logger = LoggerFactory.getLogger(WatchdogProcessor.class);
 	
-	private String name;
+	// if the queue is empty and process thread is idle, make it sleep for a while
+	private static final Long IDLE_SLEEP_TIME = 3L; // seconds
+	
+	private String name;	// the name of processor [thread]
+	
+	protected Integer capacity;	// the capacity of the processor's queue
+	protected Integer processorNum;	// the number of processor threads
+	
+	private LinkedBlockingQueue<Event> processQueue;
+	private Map<Thread, ProcessorRunner> runnerMap;
+	
 	private AtomicBoolean initialized = new AtomicBoolean(false);
-	
-	protected LinkedBlockingQueue<Event> processQueue;
-	protected Map<Thread, ProcessorRunner> runnerMap;
-	
 	
 	public WatchdogProcessor(String name) {
 		this.name = name;
 		this.runnerMap = Maps.newHashMap();
 	}
 	
+	protected abstract void doInitialize();
+	
 	@Override
 	public void initialize() {
+		if (initialized.get()) {
+			return;
+		}
+		
+		processQueue = new LinkedBlockingQueue<Event>(capacity);
+		doInitialize();
+		
 		setInitialized(true);
 		logger.info(String.format("%s has been initialized.", getName()));
 	}
+	
+	/**
+	 * make a judge about whether or not a given event can be permitted to the processor's queue.
+	 * @param event
+	 * @return
+	 */
+	protected abstract boolean isPermitted(Event event);
 	
 	@Override
 	public void take(Event event) {
@@ -60,11 +82,27 @@ public abstract class WatchdogProcessor implements Processor, TimerRunnable {
 	}
 	
 	/**
-	 * make a judge about whether or not a given event can be permitted to the processor's queue.
+	 * process the event in the way of current processor.
 	 * @param event
-	 * @return
 	 */
-	protected abstract boolean isPermitted(Event event);
+	protected abstract void processEvent(Event event);
+	
+	@Override
+	public void process() {
+		Event event = processQueue.poll();
+		if (event == null) {
+			try {
+				Thread.sleep(IDLE_SLEEP_TIME*1000);
+			} catch (InterruptedException ex) {
+				//ex.printStackTrace();
+				logger.warn("Thread [%s] has been interrupted while processing events. Exiting.", 
+						Thread.currentThread().getName());
+			}
+			return;
+		}
+		
+		processEvent(event);
+	}
 	
 	public void stopAllRunners() {
 		if (runnerMap == null) {
@@ -92,15 +130,38 @@ public abstract class WatchdogProcessor implements Processor, TimerRunnable {
 		return initialized.get();
 	}
 
-	protected void setInitialized(Boolean b) {
+	private void setInitialized(Boolean b) {
 		initialized.set(b);
+	}
+	
+	/**
+	 * create the processor runners and start them.
+	 * if the processor runner has already been created, check whether they are alive.
+	 */
+	protected void createAndCheckProcessors() {
+		if (runnerMap.size() == 0) {
+			ProcessorRunner processorRunner = new ProcessorRunner(this);
+			
+			for (int i = 0; i < processorNum; i++) {
+				Thread processorThread = new Thread(processorRunner);
+				
+				processorThread.setName(String.format("%s-%d", getName(), i));
+				
+				runnerMap.put(processorThread, processorRunner);
+				logger.info(String.format("start the processor thread [%s]", processorThread.getName()));
+				processorThread.start();
+			}
+			return;
+		}
+		
+		checkProcessorHealth();
 	}
 	
 	/**
 	 * <p>check all the processor threads in runnerMap.</p>
 	 * <p>clear the terminated threads, and restart them with new threads.</p>
 	 */
-	protected void checkProcessorHealth() {
+	private void checkProcessorHealth() {
 		Map<Thread, ProcessorRunner> cacheRunnerMap = Maps.newHashMap();
 		
 		Iterator<Entry<Thread, ProcessorRunner>> it = runnerMap.entrySet().iterator();

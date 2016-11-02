@@ -1,7 +1,5 @@
 package org.binggo.apiwatchdog.processor.alarm;
 
-import java.util.concurrent.LinkedBlockingQueue;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,13 +17,13 @@ import org.binggo.apiwatchdog.common.WatchdogException;
 import org.binggo.apiwatchdog.config.Config;
 import org.binggo.apiwatchdog.domain.ApiCall;
 
+/**
+ * @author Binggo
+ */
 @Component("alarmProcessor")
 public class AlarmProcessor extends WatchdogProcessor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AlarmProcessor.class);
-	
-	private Integer capacity;
-	private Integer processorNum;
 	
 	private Config config;
 	
@@ -42,16 +40,14 @@ public class AlarmProcessor extends WatchdogProcessor {
 		processorNum = env.getInteger(AlarmConstants.ALARM_THREAD_NUM_CONFIG, AlarmConstants.ALARM_THREAD_NUM_DEFAULT);
 		senderUrl = env.getString(AlarmConstants.SENDER_URL_CONFIG, "");
 		
-		processQueue = new LinkedBlockingQueue<Event>(capacity);
 		httpUtils = new HttpClientUtils();
 		jsonParser = new JsonParser();
-		
 		this.config = config;
 	}
 
 	@Override
-	public void initialize() {
-		super.initialize();
+	protected void doInitialize() {
+		// nothing to do
 	}
 	
 	protected boolean isPermitted(Event event) {
@@ -68,19 +64,7 @@ public class AlarmProcessor extends WatchdogProcessor {
 	 * support to send alarm messages
 	 */
 	@Override
-	public void process() {
-		Event event = processQueue.poll();
-		if (event == null) {
-			try {
-				Thread.sleep(AlarmConstants.IDLE_SLEEP_TIME*1000);
-			} catch (InterruptedException ex) {
-				//ex.printStackTrace();
-				logger.warn("Thread [%s] has been interrupted while processing events. Exiting.", 
-						Thread.currentThread().getName());
-			}
-			return;
-		}
-		
+	protected void processEvent(Event event) {
 		sendWeixinMessage(event);
 		sendMailMessage(event);
 		sendSmsMessage(event);
@@ -178,24 +162,7 @@ public class AlarmProcessor extends WatchdogProcessor {
 			return;
 		}
 		
-		// create the alarm processor threads
-		if (runnerMap.size() == 0) {
-			ProcessorRunner alarmRunner = new ProcessorRunner(this);
-			for (int i = 0; i < processorNum; i++) {
-				Thread alarmThread = new Thread(alarmRunner);
-				
-				alarmThread.setName(String.format("%s-%d", getName(), i));
-				
-				runnerMap.put(alarmThread, alarmRunner);
-				logger.info(String.format("start the alarm processor thread [%s]", alarmThread.getName()));
-				alarmThread.start();
-			}
-			
-			return;
-		}
-		
-		// clear the terminated alarm processor threads
-		checkProcessorHealth();
+		createAndCheckProcessors();
 	}
 	
 }

@@ -1,7 +1,5 @@
 package org.binggo.apiwatchdog.processor.badcall;
 
-import java.util.concurrent.LinkedBlockingQueue;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,37 +18,27 @@ import org.binggo.apiwatchdog.mapper.ApiBadCallMapper;
  * <p>1. A API call which has no response (timeout in other words).</p>
  * <p>2. A API call whose response code of HTTP is not 200.</p>
  * <p>3. A API call whose return code of API is not 0.</p>
+ * @author Binggo
  */
 @Component("badCallProcessor")
 public class BadCallProcessor extends WatchdogProcessor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(BadCallProcessor.class);
 	
-	private static final String QUEUE_CAPACITY_CONFIG = "apiwatchdog.badcall.queue.capacity";
-	private static final Integer QUEUE_CAPACITY_DEFAULT = 10000;
-	
-	private static final String PROCESSOR_NAME = "Badcall-Processor";
-	private static final Integer PROCESSOR_THREAD_NUM = 1;
-	
-	// if the bad call queue is empty and collector thread is idle, make it sleep for a while
-	private static final Long IDLE_SLEEP_TIME = 3L; // seconds
-	
-	private Integer capacity;
-	
 	@Autowired
 	private volatile ApiBadCallMapper apiBadCallMapper;
 	
 	@Autowired
 	public BadCallProcessor(WatchdogEnv env) {
-		super(PROCESSOR_NAME);
+		super(BadCallConstants.PROCESSOR_NAME);
 		
-		capacity = env.getInteger(QUEUE_CAPACITY_CONFIG, QUEUE_CAPACITY_DEFAULT);
-		processQueue = new LinkedBlockingQueue<Event>(capacity);
+		capacity = env.getInteger(BadCallConstants.QUEUE_CAPACITY_CONFIG, BadCallConstants.QUEUE_CAPACITY_DEFAULT);
+		processorNum = env.getInteger(BadCallConstants.BADCALL_THREAD_NUM_CONFIG, BadCallConstants.BADCALL_THREAD_NUM_DEFAULT);
 	}
 	
 	@Override
-	public void initialize() {
-		super.initialize();
+	protected void doInitialize() {
+		// nothing to do
 	}
 
 	protected boolean isPermitted(Event event) {
@@ -87,19 +75,7 @@ public class BadCallProcessor extends WatchdogProcessor {
 	 * store all the bad API call information from to MySQL
 	 */
 	@Override
-	public void process() {
-		Event event = processQueue.poll();
-		if (event == null) {
-			try {
-				Thread.sleep(IDLE_SLEEP_TIME*1000);
-			} catch (InterruptedException ex) {
-				//ex.printStackTrace();
-				logger.warn("Thread [%s] has been interrupted while processing events. Exiting.", 
-						Thread.currentThread().getName());
-			}
-			return;
-		}
-	
+	protected void processEvent(Event event) {
 		// store the bad call to MySQL
 		apiBadCallMapper.insert((ApiCall) event.getBody()); 
 	}
@@ -116,25 +92,6 @@ public class BadCallProcessor extends WatchdogProcessor {
 			return;
 		}
 		
-		// create the bad call processor threads
-		if (runnerMap.size() == 0) {
-			ProcessorRunner badCallRunner = new ProcessorRunner(this);
-			
-			for (int i = 0; i < PROCESSOR_THREAD_NUM; i++) {
-				Thread badCallThread = new Thread(badCallRunner);
-				
-				badCallThread.setName(String.format("%s-%d", getName(), i));
-				
-				runnerMap.put(badCallThread, badCallRunner);
-				logger.info(String.format("start the bad call processor thread [%s]", badCallThread.getName()));
-				badCallThread.start();
-			}
-			
-			return;
-		}
-		
-		// clear the terminated bad call processor threads
-		checkProcessorHealth();
+		createAndCheckProcessors();
 	}
-
 }

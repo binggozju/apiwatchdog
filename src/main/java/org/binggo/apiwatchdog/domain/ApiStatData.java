@@ -15,7 +15,7 @@ public class ApiStatData {
 
     private Integer count200Not0;
 
-    private Double resptimeAverage;
+    private Integer resptimeTotal;
 
     private Integer resptime0s1s;
 
@@ -89,12 +89,12 @@ public class ApiStatData {
         this.count200Not0 = count200Not0;
     }
 
-    public Double getResptimeAverage() {
-        return resptimeAverage;
+    public Integer getResptimeTotal() {
+        return resptimeTotal;
     }
 
-    public void setResptimeAverage(Double resptimeAverage) {
-        this.resptimeAverage = resptimeAverage;
+    public void setResptimeTotal(Integer resptimeTotal) {
+        this.resptimeTotal = resptimeTotal;
     }
 
     public Integer getResptime0s1s() {

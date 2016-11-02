@@ -35,9 +35,9 @@ HOST=http://localhost:9026
 # -------------- collector ------------------
 # curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"apiId\":1, \"callUuid\": \"09A7A151-3821-2D1B-0763-B63728F16D5F\", \"requestTime\":\"2016-10-26 11:46:40\", \"sourceService\":\"clientapp\"}" $HOST/collector/collect 2> /dev/null
 
-# curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"apiId\":1, \"callUuid\": \"29A8A151-3821-2D1B-0763-B63728F16D5F\", \"requestTime\":\"2016-10-26 11:46:40\", \"responseTime\":\"2016-10-26 11:46:48\", \"httpReponseCode\":\"200\", \"apiReturnCode\":\"0\", \"sourceService\":\"clientapp\"}" $HOST/collector/collect 2> /dev/null
+curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"apiId\":2, \"callUuid\": \"29A8A151-3821-2D1B-0763-B63728F16D5F\", \"requestTime\":\"2016-10-26 11:46:40\", \"responseTime\":\"2016-10-26 11:46:48\", \"httpReponseCode\":\"200\", \"apiReturnCode\":\"0\", \"sourceService\":\"clientapp\"}" $HOST/collector/collect 2> /dev/null
 
-curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"apiId\":1, \"callUuid\": \"39A8A151-3821-2D1B-0763-B63728F16D5F\", \"requestTime\":\"2016-10-26 11:46:40\", \"responseTime\":\"2016-10-26 11:46:42\", \"httpReponseCode\":\"404\", \"apiReturnCode\":\"0\", \"sourceService\":\"clientapp\"}" $HOST/collector/collect 2> /dev/null
+#curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"apiId\":1, \"callUuid\": \"39A8A151-3821-2D1B-0763-B63728F16D5F\", \"requestTime\":\"2016-10-26 11:46:40\", \"responseTime\":\"2016-10-26 11:46:42\", \"httpReponseCode\":\"404\", \"apiReturnCode\":\"0\", \"sourceService\":\"clientapp\"}" $HOST/collector/collect 2> /dev/null
 
 
 # -------------- admin ------------------

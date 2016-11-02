@@ -48,10 +48,10 @@ public class ConfigController {
 		
 		try {
 			configService.addApiProvider(apiProvider);
-			return WatchdogResponse.OK_RESPONSE;
+			return WatchdogResponse.SIMPLE_OK_RESPONSE;
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
-			return new WatchdogResponse(ex.getReturnCode());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
 		}
 	}
 	
@@ -61,10 +61,10 @@ public class ConfigController {
 		
 		try {
 			configService.deleteApiProvider(providerId);
-			return WatchdogResponse.OK_RESPONSE;
+			return WatchdogResponse.SIMPLE_OK_RESPONSE;
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
-			return new WatchdogResponse(ex.getReturnCode());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
 		}
 	}
 	
@@ -74,10 +74,10 @@ public class ConfigController {
 		
 		try {
 			configService.updateApiProvider(apiProvider);
-			return WatchdogResponse.OK_RESPONSE;
+			return WatchdogResponse.SIMPLE_OK_RESPONSE;
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
-			return new WatchdogResponse(ex.getReturnCode());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
 		}
 	}
 	
@@ -96,7 +96,7 @@ public class ConfigController {
 		// without paging
 		if (offset == null && size == null) {
 			List<ApiProvider> apiProviderList = configService.listApiProviders();
-			return new WatchdogResponse(ReturnCode.OK, apiProviderList);
+			return WatchdogResponse.getResponse(ReturnCode.OK, apiProviderList);
 		}
 		
 		// paging
@@ -106,7 +106,7 @@ public class ConfigController {
 		
 		List<ApiProvider> apiProviderList = configService.listApiProviders();
 		PageInfoExt<ApiProvider> apiProviderPage = new PageInfoExt<ApiProvider>(apiProviderList);
-		return new WatchdogResponse(ReturnCode.OK, apiProviderPage);
+		return WatchdogResponse.getResponse(ReturnCode.OK, apiProviderPage);
 	}
 	
 	// API
@@ -116,10 +116,10 @@ public class ConfigController {
 		
 		try {
 			configService.addApiItem(apiItem);
-			return WatchdogResponse.OK_RESPONSE;
+			return WatchdogResponse.SIMPLE_OK_RESPONSE;
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
-			return new WatchdogResponse(ex.getReturnCode());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
 		}
 	}
 	
@@ -129,10 +129,10 @@ public class ConfigController {
 		
 		try {
 			configService.deleteApiItem(apiId);
-			return WatchdogResponse.OK_RESPONSE;
+			return WatchdogResponse.SIMPLE_OK_RESPONSE;
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
-			return new WatchdogResponse(ex.getReturnCode());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
 		}
 	}
 	
@@ -142,10 +142,10 @@ public class ConfigController {
 		
 		try {
 			configService.updateApiItem(apiItem);
-			return WatchdogResponse.OK_RESPONSE;
+			return WatchdogResponse.SIMPLE_OK_RESPONSE;
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
-			return new WatchdogResponse(ex.getReturnCode());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
 		}
 	}
 	
@@ -170,10 +170,10 @@ public class ConfigController {
 		if (offset == null && size == null) {
 			if (providerId == null) {
 				apiItemList = configService.listApiItems();
-				return new WatchdogResponse(ReturnCode.OK, apiItemList);
+				return WatchdogResponse.getResponse(ReturnCode.OK, apiItemList);
 			} else {
 				apiItemList = configService.listApiItems(Integer.parseInt(providerId));
-				return new WatchdogResponse(ReturnCode.OK, apiItemList);
+				return WatchdogResponse.getResponse(ReturnCode.OK, apiItemList);
 			}	
 		}
 		
@@ -185,11 +185,11 @@ public class ConfigController {
 		if (providerId == null) {
 			apiItemList = configService.listApiItems();
 			PageInfoExt<ApiItem> apiItemPage = new PageInfoExt<ApiItem>(apiItemList);
-			return new WatchdogResponse(ReturnCode.OK, apiItemPage);	
+			return WatchdogResponse.getResponse(ReturnCode.OK, apiItemPage);	
 		} else {
 			apiItemList = configService.listApiItems(Integer.parseInt(providerId));
 			PageInfoExt<ApiItem> apiItemPage = new PageInfoExt<ApiItem>(apiItemList);
-			return new WatchdogResponse(ReturnCode.OK, apiItemPage);	
+			return WatchdogResponse.getResponse(ReturnCode.OK, apiItemPage);
 		}
 	}
 }

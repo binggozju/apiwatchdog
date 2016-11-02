@@ -8,7 +8,7 @@
     <result column="count_timeout" property="countTimeout" jdbcType="INTEGER" />
     <result column="count_not200" property="countNot200" jdbcType="INTEGER" />
     <result column="count_200_not0" property="count200Not0" jdbcType="INTEGER" />
-    <result column="resptime_average" property="resptimeAverage" jdbcType="DOUBLE" />
+    <result column="resptime_total" property="resptimeTotal" jdbcType="INTEGER" />
     <result column="resptime_0s_1s" property="resptime0s1s" jdbcType="INTEGER" />
     <result column="resptime_1s_2s" property="resptime1s2s" jdbcType="INTEGER" />
     <result column="resptime_2s_3s" property="resptime2s3s" jdbcType="INTEGER" />
@@ -26,7 +26,7 @@
   <insert id="insert" parameterType="org.binggo.apiwatchdog.domain.ApiStatData" useGeneratedKeys="true" keyProperty="id">
     insert into api_stat_data (
     	api_id, start_time, count_total, count_timeout, count_not200, count_200_not0, 
-      	resptime_average, resptime_0s_1s, resptime_1s_2s, 
+      	resptime_total, resptime_0s_1s, resptime_1s_2s, 
       	resptime_2s_3s, resptime_3s_4s, resptime_4s_5s, 
       	resptime_5s_6s, resptime_6s_7s, resptime_7s_8s, 
       	resptime_8s_9s, resptime_10s_11s, resptime_11s_12s, 
@@ -34,7 +34,7 @@
     ) values (
     	#{apiId,jdbcType=INTEGER}, #{startTime,jdbcType=TIMESTAMP}, #{countTotal,jdbcType=INTEGER}, 
       	#{countTimeout,jdbcType=INTEGER}, #{countNot200,jdbcType=INTEGER}, #{count200Not0,jdbcType=INTEGER}, 
-      	#{resptimeAverage,jdbcType=DOUBLE}, #{resptime0s1s,jdbcType=INTEGER}, #{resptime1s2s,jdbcType=INTEGER}, 
+      	#{resptimeTotal,jdbcType=INTEGER}, #{resptime0s1s,jdbcType=INTEGER}, #{resptime1s2s,jdbcType=INTEGER}, 
       	#{resptime2s3s,jdbcType=INTEGER}, #{resptime3s4s,jdbcType=INTEGER}, #{resptime4s5s,jdbcType=INTEGER}, 
       	#{resptime5s6s,jdbcType=INTEGER}, #{resptime6s7s,jdbcType=INTEGER}, #{resptime7s8s,jdbcType=INTEGER}, 
       	#{resptime8s9s,jdbcType=INTEGER}, #{resptime10s11s,jdbcType=INTEGER}, #{resptime11s12s,jdbcType=INTEGER}, 

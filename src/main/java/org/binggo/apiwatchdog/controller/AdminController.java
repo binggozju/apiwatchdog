@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 
- * @author Administrator
- *
+ * @author Binggo
  */
 @RestController
 @RequestMapping("/admin")

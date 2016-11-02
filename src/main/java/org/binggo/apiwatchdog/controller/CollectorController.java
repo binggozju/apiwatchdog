@@ -40,10 +40,10 @@ public class CollectorController {
 		
 		try {
 			collector.collect(Event.buildEvent(apiCall));
-			return WatchdogResponse.OK_RESPONSE;
+			return WatchdogResponse.SIMPLE_OK_RESPONSE;
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
-			return new WatchdogResponse(ex.getReturnCode());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
 		}
 	}
 

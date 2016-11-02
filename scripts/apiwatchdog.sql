@@ -75,7 +75,7 @@ CREATE TABLE `api_stat_data` (
   `count_timeout` int(10) unsigned NOT NULL COMMENT '5分钟内指定api超时或未收到回包的调用次数',
   `count_not200` int(10) unsigned NOT NULL COMMENT '5分钟内指定api http响应码非200的调用次数',
   `count_200_not0` int(10) unsigned NOT NULL COMMENT '5分钟内指定api http响应码为200但api返回码非0的调用次数',
-  `resptime_average` double NOT NULL COMMENT '5分钟内所有收到回包的api调用的平均响应时间',
+  `resptime_total` int(10) unsigned NOT NULL COMMENT '5分钟内所有收到回包的api调用的累计响应时间',
   `resptime_0s_1s` int(10) unsigned NOT NULL COMMENT '5分钟内响应时间在0s-1s之间的api调用次数',
   `resptime_1s_2s` int(10) unsigned NOT NULL COMMENT '5分钟内响应时间在1s-2s之间的api调用次数',
   `resptime_2s_3s` int(10) unsigned NOT NULL,
