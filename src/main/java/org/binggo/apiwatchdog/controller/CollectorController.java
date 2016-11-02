@@ -18,8 +18,7 @@ import org.binggo.apiwatchdog.domain.ApiCall;
 
 /**
  * provide the entry to send the event (API call information) through HTTP, but it is just an optional way.
- * @author Administrator
- *
+ * @author Binggo
  */
 @RestController
 @RequestMapping("/collector")

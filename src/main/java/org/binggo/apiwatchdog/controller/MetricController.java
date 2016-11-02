@@ -7,19 +7,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.binggo.apiwatchdog.service.StatisService;
+import org.binggo.apiwatchdog.service.MetricService;
 
 /**
  * 
  * @author Binggo
  */
 @RestController
-@RequestMapping("/statis")
-public class StatisController {
+@RequestMapping("/metric")
+public class MetricController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(StatisController.class);
+	private static final Logger logger = LoggerFactory.getLogger(MetricController.class);
 	
 	@Autowired
-	private StatisService statisService;
+	private MetricService metricService;
 
 }
