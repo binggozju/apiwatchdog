@@ -10,6 +10,9 @@
     <result column="version" property="version" jdbcType="VARCHAR" />
     <result column="provider_id" property="providerId" jdbcType="INTEGER" />
     <result column="state" property="state" jdbcType="TINYINT" />
+    <result column="weixin_receivers" property="weixinReceivers" jdbcType="VARCHAR" />
+    <result column="mail_receivers" property="mailReceivers" jdbcType="VARCHAR" />
+    <result column="phone_receivers" property="phoneReceivers" jdbcType="VARCHAR" />
     <result column="metric_not200" property="metricNot200" jdbcType="TINYINT" />
     <result column="metric_200_not0" property="metric200Not0" jdbcType="TINYINT" />
     <result column="metric_resptime_threshold" property="metricResptimeThreshold" jdbcType="TINYINT" />
@@ -20,6 +23,9 @@
   	<id column="api_id" property="apiId" jdbcType="INTEGER" />
   	<result column="provider_id" property="providerId" jdbcType="INTEGER" />
     <result column="state" property="state" jdbcType="TINYINT" />
+    <result column="weixin_receivers" property="weixinReceivers" jdbcType="VARCHAR" />
+    <result column="mail_receivers" property="mailReceivers" jdbcType="VARCHAR" />
+    <result column="phone_receivers" property="phoneReceivers" jdbcType="VARCHAR" />
     <result column="metric_not200" property="metricNot200" jdbcType="TINYINT" />
     <result column="metric_200_not0" property="metric200Not0" jdbcType="TINYINT" />
     <result column="metric_resptime_threshold" property="metricResptimeThreshold" jdbcType="TINYINT" />
@@ -28,6 +34,7 @@
   
   <sql id="Base_Column_List" >
     name, description, path, type, version, provider_id, state, 
+    weixin_receivers, mail_receivers, phone_receivers,
     metric_not200, metric_200_not0, metric_resptime_threshold, alarm_type
   </sql>
   
@@ -39,7 +46,8 @@
   	) values (
   		#{name,jdbcType=VARCHAR}, #{description,jdbcType=LONGVARCHAR}, #{path,jdbcType=VARCHAR}, 
       	#{type,jdbcType=VARCHAR}, #{version,jdbcType=VARCHAR}, #{providerId,jdbcType=INTEGER}, 
-      	#{state,jdbcType=TINYINT}, #{metricNot200,jdbcType=TINYINT}, #{metric200Not0,jdbcType=TINYINT}, 
+      	#{state,jdbcType=TINYINT}, #{weixinReceivers,jdbcType=VARCHAR}, #{mailReceivers,jdbcType=VARCHAR}, 
+      	#{phoneReceivers,jdbcType=VARCHAR}, #{metricNot200,jdbcType=TINYINT}, #{metric200Not0,jdbcType=TINYINT}, 
       	#{metricResptimeThreshold,jdbcType=TINYINT}, #{alarmType,jdbcType=TINYINT},
       	now(), now()
   	)
@@ -72,6 +80,15 @@
       </if>
       <if test="state != null" >
         state = #{state,jdbcType=TINYINT},
+      </if>
+      <if test="weixinReceivers != null" >
+        weixin_receivers = #{weixinReceivers,jdbcType=VARCHAR},
+      </if>
+      <if test="mailReceivers != null" >
+        mail_receivers = #{mailReceivers,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneReceivers != null" >
+        phone_receivers = #{phoneReceivers,jdbcType=VARCHAR},
       </if>
       <if test="metricNot200 != null" >
         metric_not200 = #{metricNot200,jdbcType=TINYINT},
@@ -108,9 +125,8 @@
   
   <!-- for ApiConfiguration -->
   <select id="listApiConf" resultMap="ApiConfResultMap">
-  	select api_id, provider_id, state, 
-    	metric_not200, metric_200_not0, metric_resptime_threshold, 
-    	alarm_type
+  	select api_id, provider_id, state, weixin_receivers, mail_receivers, phone_receivers,
+    	metric_not200, metric_200_not0, metric_resptime_threshold, alarm_type
     from api_item
   </select>
   

@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
-
 import org.binggo.apiwatchdog.Event;
 import org.binggo.apiwatchdog.TimerRunnable;
 import org.binggo.apiwatchdog.domain.ApiCall;
@@ -74,11 +72,27 @@ public class Config implements TimerRunnable {
 		// add helpful information to the headers
 		String alarmType = apiConfMap.get(apiId).getAlarmType().toString();
 		event.addHeader(AlarmTemplate.ALARM_TYPE_KEY, alarmType);
-		String weixinReceivers = providerConfMap.get(providerId).getWeixinReceivers();
+		
+		
+		String weixinReceivers = apiConfMap.get(apiId).getWeixinReceivers();
+		if (weixinReceivers == null || weixinReceivers.equals("")) {
+			String defaultWeixinReceivers = providerConfMap.get(providerId).getWeixinReceivers();
+			weixinReceivers = defaultWeixinReceivers;
+		}
 		event.addHeader(AlarmTemplate.WEIXIN_RECEIVERS_KEY, weixinReceivers);
-		String mailReceivers = providerConfMap.get(providerId).getMailReceivers();
+		
+		String mailReceivers = apiConfMap.get(apiId).getMailReceivers();
+		if (mailReceivers == null || mailReceivers.equals("")) {
+			String defaultMailReceivers = providerConfMap.get(providerId).getMailReceivers();
+			mailReceivers = defaultMailReceivers;
+		}
 		event.addHeader(AlarmTemplate.MAIL_RECEIVERS_KEY, mailReceivers);
-		String phoneReceivers = providerConfMap.get(providerId).getPhoneReceivers();
+		
+		String phoneReceivers = apiConfMap.get(apiId).getPhoneReceivers();
+		if (phoneReceivers == null || phoneReceivers.equals("")) {
+			String defaultPhoneReceivers = providerConfMap.get(providerId).getPhoneReceivers();
+			phoneReceivers = defaultPhoneReceivers;
+		}
 		event.addHeader(AlarmTemplate.SMS_RECEIVERS_KEY, phoneReceivers);
 		
 		// check provider's state
@@ -131,9 +145,8 @@ public class Config implements TimerRunnable {
 	private void refreshConfigData() {
 		// get the new configuration for providers
 		List<ProviderConfiguration> providerConfList = apiProviderMapper.listProviderConf();
-		if (providerConfList == null) {
+		if (providerConfList.size() == 0) {
 			logger.warn("there is no provider configuration");
-			providerConfList = Lists.newArrayList();
 		}
 		for (ProviderConfiguration pConf : providerConfList) {
 			Integer providerId = pConf.getProviderId();
@@ -142,9 +155,8 @@ public class Config implements TimerRunnable {
 		
 		// get the new configuration for API
 		List<ApiConfiguration> apiConfList = apiItemMapper.listApiConf();
-		if (apiConfList == null) {
+		if (apiConfList.size() == 0) {
 			logger.warn("there is no API configuration");
-			apiConfList = Lists.newArrayList();
 		}
 		for (ApiConfiguration aConf : apiConfList) {
 			Integer apiId = aConf.getApiId();

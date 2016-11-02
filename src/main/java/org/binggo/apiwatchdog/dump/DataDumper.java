@@ -72,7 +72,7 @@ public class DataDumper implements TimerRunnable {
 	}
 	
 
-	@Scheduled(initialDelay=5000, fixedDelay=5000)
+	//@Scheduled(initialDelay=5000, fixedDelay=5000)
 	@Override
 	public void runTimerTask() {
 		// create and start the data dumper thread

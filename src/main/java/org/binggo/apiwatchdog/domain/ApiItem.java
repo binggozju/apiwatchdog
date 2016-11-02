@@ -14,6 +14,12 @@ public class ApiItem {
     private Integer providerId;
 
     private Byte state;
+    
+    private String weixinReceivers;
+
+    private String mailReceivers;
+
+    private String phoneReceivers;
 
     private Byte metricNot200;
 
@@ -81,6 +87,30 @@ public class ApiItem {
         this.state = state;
     }
 
+    public String getWeixinReceivers() {
+        return weixinReceivers;
+    }
+
+    public void setWeixinReceivers(String weixinReceivers) {
+        this.weixinReceivers = weixinReceivers == null ? null : weixinReceivers.trim();
+    }
+
+    public String getMailReceivers() {
+        return mailReceivers;
+    }
+
+    public void setMailReceivers(String mailReceivers) {
+        this.mailReceivers = mailReceivers == null ? null : mailReceivers.trim();
+    }
+
+    public String getPhoneReceivers() {
+        return phoneReceivers;
+    }
+
+    public void setPhoneReceivers(String phoneReceivers) {
+        this.phoneReceivers = phoneReceivers == null ? null : phoneReceivers.trim();
+    }
+    
     public Byte getMetricNot200() {
         return metricNot200;
     }

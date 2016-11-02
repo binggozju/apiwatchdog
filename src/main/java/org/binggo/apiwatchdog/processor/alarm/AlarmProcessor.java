@@ -79,6 +79,12 @@ public class AlarmProcessor extends WatchdogProcessor {
 		String weixinReceivers = event.getHeaders().get(AlarmTemplate.WEIXIN_RECEIVERS_KEY);
 		String weixinContent = AlarmTemplate.getAlarmMessage(event);
 		
+		if (weixinReceivers == null || weixinReceivers.equals("")) {
+			logger.error(String.format("The weixin receivers of API [%d] is null, quit", 
+					((ApiCall) event.getBody()).getApiId()));
+			return;
+		}
+		
 		JsonObject jsonParams = new JsonObject();
 		jsonParams.addProperty("receivers", weixinReceivers);
 		jsonParams.addProperty("content", weixinContent);
@@ -114,6 +120,12 @@ public class AlarmProcessor extends WatchdogProcessor {
 		String mailSenderUrl = String.format("%s/mail/async", senderUrl);
 		String mailReceivers = event.getHeaders().get(AlarmTemplate.MAIL_RECEIVERS_KEY);
 		String mailContent = AlarmTemplate.getAlarmMessage(event);
+		
+		if (mailReceivers == null || mailReceivers.equals("")) {
+			logger.error(String.format("The mail receivers of API [%d] is null, quit", 
+					((ApiCall) event.getBody()).getApiId()));
+			return;
+		}
 		
 		JsonObject jsonParams = new JsonObject();
 		jsonParams.addProperty("subject", "API调用监控实时告警");

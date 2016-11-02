@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.Lists;
-
 import org.binggo.apiwatchdog.common.ReturnCode;
 import org.binggo.apiwatchdog.common.WatchdogException;
 import org.binggo.apiwatchdog.mapper.ApiProviderMapper;
@@ -60,9 +58,8 @@ public class ConfigService {
 	public List<ApiProvider> listApiProviders() {
 		List<ApiProvider> apiProviderList = apiProviderMapper.listApiProviders();
 		
-		if (apiProviderList == null) {
+		if (apiProviderList.size() == 0) {
 			logger.warn("there is no api provider registered so far");
-			apiProviderList = Lists.newArrayList();
 		}
 		
 		return apiProviderList;
@@ -98,9 +95,8 @@ public class ConfigService {
 	public List<ApiItem> listApiItems(Integer providerId) {
 		List<ApiItem> apiItemList = apiItemMapper.listApiItemsByProviderId(providerId);
 		
-		if (apiItemList == null) {
+		if (apiItemList.size() == 0) {
 			logger.warn(String.format("there is no api registered for api provider [providerId=%d]", providerId));
-			apiItemList = Lists.newArrayList();
 		}
 
 		return apiItemList;
@@ -109,9 +105,8 @@ public class ConfigService {
 	public List<ApiItem> listApiItems() {
 		List<ApiItem> apiItemList = apiItemMapper.listApiItems();
 		
-		if (apiItemList == null) {
+		if (apiItemList.size() == 0) {
 			logger.warn("there is no api registered so far");
-			apiItemList = Lists.newArrayList();
 		}
 		
 		return apiItemList;
