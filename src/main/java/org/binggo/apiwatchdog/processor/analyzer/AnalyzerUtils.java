@@ -12,9 +12,6 @@ public class AnalyzerUtils {
 	public static final String ANALYZER_THREAD_NUM_CONFIG = "apiwatchdog.analyzer.runner.num";
 	public static final Integer ANALYZER_THREAD_NUM_DEFAULT = 3;
 	
-	public static final String REDIS_KEYS_EXPIRE_CONFIG = "apiwatchdog.redis.keys.expire";
-	public static final Integer REDIS_KEYS_EXPIRE_DEFAULT = 7*24*60; // minutes
-	
 	public static final String PROCESSOR_NAME = "Analyzer-Processor";
 	
 	

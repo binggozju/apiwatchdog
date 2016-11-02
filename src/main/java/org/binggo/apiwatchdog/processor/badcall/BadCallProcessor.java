@@ -80,7 +80,7 @@ public class BadCallProcessor extends WatchdogProcessor {
 		apiBadCallMapper.insert((ApiCall) event.getBody()); 
 	}
 	
-	@Scheduled(initialDelay=1000, fixedDelay = 3000)
+	@Scheduled(initialDelay=1000, fixedDelay=3000)
 	@Override
 	public void runTimerTask() {
 		if (!isInitialized()) {

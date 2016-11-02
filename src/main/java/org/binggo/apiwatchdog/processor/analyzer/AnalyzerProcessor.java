@@ -34,7 +34,6 @@ public class AnalyzerProcessor extends WatchdogProcessor {
 		
 		capacity = env.getInteger(AnalyzerUtils.QUEUE_CAPACITY_CONFIG, AnalyzerUtils.QUEUE_CAPACITY_DEFAULT);
 		processorNum = env.getInteger(AnalyzerUtils.ANALYZER_THREAD_NUM_CONFIG, AnalyzerUtils.ANALYZER_THREAD_NUM_DEFAULT);
-		keysExpireTime = env.getInteger(AnalyzerUtils.REDIS_KEYS_EXPIRE_CONFIG, AnalyzerUtils.REDIS_KEYS_EXPIRE_DEFAULT);
 		
 		this.template = template;
 	}
@@ -100,7 +99,7 @@ public class AnalyzerProcessor extends WatchdogProcessor {
 		}
 	}
 
-	@Scheduled(initialDelay=1000, fixedDelay = 3000)
+	@Scheduled(initialDelay=1000, fixedDelay=3000)
 	@Override
 	public void runTimerTask() {
 		if (!isInitialized()) {

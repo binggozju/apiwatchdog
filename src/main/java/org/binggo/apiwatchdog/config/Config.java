@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Lists;
 
 import org.binggo.apiwatchdog.Event;
+import org.binggo.apiwatchdog.TimerRunnable;
 import org.binggo.apiwatchdog.domain.ApiCall;
 import org.binggo.apiwatchdog.mapper.ApiItemMapper;
 import org.binggo.apiwatchdog.mapper.ApiProviderMapper;
@@ -27,7 +28,7 @@ import org.binggo.apiwatchdog.processor.alarm.AlarmTemplate;
  *
  */
 @Component
-public class Config {
+public class Config implements TimerRunnable {
 	
 	private static final Logger logger = LoggerFactory.getLogger(Config.class);
 	
@@ -127,21 +128,7 @@ public class Config {
 		return false;
 	}
 	
-	/**
-	 * refresh the configuration of API providers and API from MySQL
-	 */
-	@Scheduled(initialDelay=500, fixedDelay = 5*60*1000)
-	public void refreshConfigData() {
-		while (apiProviderMapper == null || apiItemMapper == null) {
-			try {
-				logger.warn("apiProviderMapper and apiItemMapper have not been injected to"
-						+ "Config by now, wait");
-				Thread.sleep(500);
-			} catch (InterruptedException ex) {
-				//ex.printStackTrace();
-			}
-		}
-		
+	private void refreshConfigData() {
 		// get the new configuration for providers
 		List<ProviderConfiguration> providerConfList = apiProviderMapper.listProviderConf();
 		if (providerConfList == null) {
@@ -176,5 +163,24 @@ public class Config {
 		apiConfCacheMap.clear();
 		
 		logger.info("refresh the configuration successfully.");
+	}
+
+	/**
+	 * refresh the configuration of API providers and API from MySQL
+	 */
+	@Scheduled(initialDelay=500, fixedDelay=5*60*1000)
+	@Override
+	public void runTimerTask() {
+		while (apiProviderMapper == null || apiItemMapper == null) {
+			try {
+				logger.warn("apiProviderMapper and apiItemMapper have not been injected to"
+						+ "Config by now, wait");
+				Thread.sleep(200);
+			} catch (InterruptedException ex) {
+				//ex.printStackTrace();
+			}
+		}
+		
+		refreshConfigData();
 	}
 }
