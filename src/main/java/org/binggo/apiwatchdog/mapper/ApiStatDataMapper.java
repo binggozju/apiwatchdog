@@ -7,5 +7,7 @@ import org.binggo.apiwatchdog.domain.ApiStatData;
 public interface ApiStatDataMapper {
 	
     int insert(ApiStatData apiStatData);
-
+    
+    int insertSelective(ApiStatData apiStatData);
+    
 }

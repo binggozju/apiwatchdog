@@ -52,7 +52,7 @@
 	</table>
 	-->
 	
-	<!-- 
+	<!--
 	<table tableName="api_stat_data" domainObjectName="ApiStatData" modelType="flat" 
 		enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" 
     	enableSelectByExample="false" selectByExampleQueryId="false">

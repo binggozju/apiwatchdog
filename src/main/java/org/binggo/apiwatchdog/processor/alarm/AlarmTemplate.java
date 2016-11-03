@@ -1,9 +1,7 @@
 package org.binggo.apiwatchdog.processor.alarm;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import org.binggo.apiwatchdog.Event;
+import org.binggo.apiwatchdog.common.CommonUtils;
 import org.binggo.apiwatchdog.domain.ApiCall;
 
 public class AlarmTemplate {
@@ -20,14 +18,11 @@ public class AlarmTemplate {
 	public static final String ALARM_REASON_NOT_HTTP200 = "not_http_200";
 	public static final String ALARM_REASON_NOT_RETCODE0 = "not_retcode_0";
 	
-	
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	
 	public static String getAlarmMessage(Event event) {
 		ApiCall apiCall = (ApiCall) event.getBody();
 		
 		Integer apiId = apiCall.getApiId();
-		String requestTime = DATE_FORMAT.format(apiCall.getRequestTime());
+		String requestTime = CommonUtils.DATE_NORMAL_FORMAT.format(apiCall.getRequestTime());
 		String source = apiCall.getSourceService();
 		String apiCallUuid = apiCall.getCallUuid();
 		

@@ -44,7 +44,7 @@ public class ConfigController {
 	// API provider
 	@RequestMapping(method=RequestMethod.POST, value="/provider/add")
 	public WatchdogResponse registerApiProvider(@RequestBody ApiProvider apiProvider) {
-		logger.debug("receive a post request to /provider/add");
+		logger.debug("receive a post request to /config/provider/add");
 		
 		try {
 			configService.addApiProvider(apiProvider);
@@ -57,7 +57,7 @@ public class ConfigController {
 	
 	@RequestMapping(method=RequestMethod.DELETE, value="/provider/{providerId}")
 	public WatchdogResponse removeApiProvider(@PathVariable("providerId") int providerId) {
-		logger.debug(String.format("receive a delete request to /provider/%d", providerId));
+		logger.debug(String.format("receive a delete request to /config/provider/%d", providerId));
 		
 		try {
 			configService.deleteApiProvider(providerId);
@@ -70,7 +70,7 @@ public class ConfigController {
 	
 	@RequestMapping(method=RequestMethod.POST, value="/provider/update")
 	public WatchdogResponse updateApiProvider(@RequestBody ApiProvider apiProvider) {
-		logger.debug("receive a post request to /provider/update");
+		logger.debug("receive a post request to /config/provider/update");
 		
 		try {
 			configService.updateApiProvider(apiProvider);
@@ -88,7 +88,7 @@ public class ConfigController {
 	 */
 	@RequestMapping(method=RequestMethod.GET, value="/provider/list")
 	public WatchdogResponse listApiProviders(@RequestParam Map<String, String> params) {
-		logger.info("receive a get request to /provider/list");
+		logger.info("receive a get request to /config/provider/list");
 		
 		String offset = params.get("offset");
 		String size = params.get("size");
@@ -112,7 +112,7 @@ public class ConfigController {
 	// API
 	@RequestMapping(method=RequestMethod.POST, value="/api/add")
 	public WatchdogResponse registerApi(@RequestBody ApiItem apiItem) {
-		logger.debug("receive a post request to /api/add");
+		logger.debug("receive a post request to /config/api/add");
 		
 		try {
 			configService.addApiItem(apiItem);
@@ -125,7 +125,7 @@ public class ConfigController {
 	
 	@RequestMapping(method=RequestMethod.DELETE, value="/api/{apiId}")
 	public WatchdogResponse removeApi(@PathVariable("apiId") int apiId) {
-		logger.debug(String.format("receive a delete request to /api/%d", apiId));
+		logger.debug(String.format("receive a delete request to /config/api/%d", apiId));
 		
 		try {
 			configService.deleteApiItem(apiId);
@@ -138,7 +138,7 @@ public class ConfigController {
 	
 	@RequestMapping(method=RequestMethod.POST, value="/api/update")
 	public WatchdogResponse updateApi(@RequestBody ApiItem apiItem) {
-		logger.debug("receive a post request to /api/update");
+		logger.debug("receive a post request to /config/api/update");
 		
 		try {
 			configService.updateApiItem(apiItem);
@@ -159,7 +159,7 @@ public class ConfigController {
 	 */
 	@RequestMapping(method=RequestMethod.GET, value="/api/list")
 	public WatchdogResponse listAllApi(@RequestParam Map<String, String> params) {
-		logger.info("receive a get request to /api/list");
+		logger.info("receive a get request to /config/api/list");
 		
 		String offset = params.get("offset");
 		String size = params.get("size");

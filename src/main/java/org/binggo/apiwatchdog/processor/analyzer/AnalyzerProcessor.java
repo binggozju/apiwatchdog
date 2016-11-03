@@ -8,6 +8,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.TimeUnit;
+
 import org.binggo.apiwatchdog.Event;
 import org.binggo.apiwatchdog.WatchdogProcessor;
 import org.binggo.apiwatchdog.common.WatchdogEnv;
@@ -25,8 +27,7 @@ public class AnalyzerProcessor extends WatchdogProcessor {
 	
 	private StringRedisTemplate template;
 	
-	@SuppressWarnings("unused")
-	private Integer keysExpireTime;
+	private Integer keysExpireTime;  // minutes
 
 	@Autowired
 	public AnalyzerProcessor(WatchdogEnv env, StringRedisTemplate template) {
@@ -34,6 +35,7 @@ public class AnalyzerProcessor extends WatchdogProcessor {
 		
 		capacity = env.getInteger(AnalyzerUtils.QUEUE_CAPACITY_CONFIG, AnalyzerUtils.QUEUE_CAPACITY_DEFAULT);
 		processorNum = env.getInteger(AnalyzerUtils.ANALYZER_THREAD_NUM_CONFIG, AnalyzerUtils.ANALYZER_THREAD_NUM_DEFAULT);
+		keysExpireTime = env.getInteger(AnalyzerUtils.REDIS_KEYS_EXPIRE_CONFIG, AnalyzerUtils.REDIS_KEYS_EXPIRE_DEFAULT);
 		
 		this.template = template;
 	}
@@ -69,12 +71,9 @@ public class AnalyzerProcessor extends WatchdogProcessor {
 		// update the statistical information in current time slice
 		template.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_COUNT_TOTAL, 1);
 		
-		// Deprecated: cann't guarantee that the expire command must be executed in concurrent environment.
-		// we adopt the manual way to remove the old keys in redis.
-		/*int current_total = (int) template.boundHashOps(redisKeyName).get(AnalyzerUtils.KEY_COUNT_TOTAL);
-		if (current_total == 1) {
+		if (template.getExpire(redisKeyName) == -1) {
 			template.expire(redisKeyName, keysExpireTime, TimeUnit.MINUTES);
-		}*/
+		}
 		
 		if (apiCall.getResponseTime() == null) {
 			template.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_COUNT_TIMEOUT, 1);

@@ -37,7 +37,7 @@ HOST=http://localhost:9026
 
 #curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"apiId\":2, \"callUuid\": \"29A8A151-3821-2D1B-0763-B63728F16D5F\", \"requestTime\":\"2016-10-26 11:46:40\", \"responseTime\":\"2016-10-26 11:46:48\", \"httpReponseCode\":\"200\", \"apiReturnCode\":\"0\", \"sourceService\":\"clientapp\"}" $HOST/collector/collect 2> /dev/null
 
-curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"apiId\":2, \"callUuid\": \"29A8A151-3821-2D1B-0763-B63728F16D5F\", \"requestTime\":\"2016-10-26 09:23:40\", \"responseTime\":\"2016-10-26 09:23:48\", \"httpReponseCode\":\"200\", \"apiReturnCode\":\"999\", \"sourceService\":\"clientapp\"}" $HOST/collector/collect 2> /dev/null
+curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"apiId\":2, \"callUuid\": \"29A8A151-3821-2D1B-0763-B63728F16D5F\", \"requestTime\":\"2016-11-03 19:06:40\", \"responseTime\":\"2016-11-03 19:06:42\", \"httpReponseCode\":\"200\", \"apiReturnCode\":\"999\", \"sourceService\":\"clientapp\"}" $HOST/collector/collect 2> /dev/null
 
 #curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"apiId\":1, \"callUuid\": \"39A8A151-3821-2D1B-0763-B63728F16D5F\", \"requestTime\":\"2016-10-26 11:46:40\", \"responseTime\":\"2016-10-26 11:46:42\", \"httpReponseCode\":\"404\", \"apiReturnCode\":\"0\", \"sourceService\":\"clientapp\"}" $HOST/collector/collect 2> /dev/null
 

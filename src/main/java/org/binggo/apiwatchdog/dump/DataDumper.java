@@ -1,8 +1,11 @@
 package org.binggo.apiwatchdog.dump;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,16 +14,23 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Maps;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.converters.IntegerConverter;
+
 import org.binggo.apiwatchdog.TimerRunnable;
 import org.binggo.apiwatchdog.WatchdogRunner;
+import org.binggo.apiwatchdog.common.CommonUtils;
 import org.binggo.apiwatchdog.common.WatchdogEnv;
+import org.binggo.apiwatchdog.domain.ApiStatData;
 import org.binggo.apiwatchdog.mapper.ApiStatDataMapper;
+import org.binggo.apiwatchdog.processor.analyzer.AnalyzerUtils;
 
 /**
  * <p>Here are what DataDumper is aimed at:</p>
  * <p>1. Dump the statistical data from Redis to MySQL in order to save the overhead of memory
  * and provide more reliable storage for statistical data.</p>
- * <p>2. Clear the old keys beyond their expire time in Redis periodically.</p>
  * <p>What's mroe, only after the DataDumper get the master role based on Zookeeper can it do the tasks above.</p>
  * @author Binggo
  */
@@ -29,12 +39,7 @@ public class DataDumper implements TimerRunnable {
 	
 	private static final Logger logger = LoggerFactory.getLogger(DataDumper.class);
 	
-	private static final String REDIS_KEYS_EXPIRE_CONFIG = "apiwatchdog.redis.keys.expire";
-	private static final Integer REDIS_KEYS_EXPIRE_DEFAULT = 7*24*60; // minutes
-	private static final String DATA_DUMPER_NAME = "Data-Dumper";
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	
-	private Integer keysExpireTime; // minutes
+	private Integer runPeriodLength;  // minutes
 	
 	private Boolean initialized = false;
 	
@@ -50,9 +55,18 @@ public class DataDumper implements TimerRunnable {
 	@Autowired
 	private ZKHelper zkHelper;
 	
+	static {
+		// support to transform the hash in Redis to ApiStatData object
+		ConvertUtils.register(new IntegerConverter(null), Integer.class);
+	}
+	
 	@Autowired
 	public DataDumper(WatchdogEnv env) {
-		keysExpireTime = env.getInteger(REDIS_KEYS_EXPIRE_CONFIG, REDIS_KEYS_EXPIRE_DEFAULT);
+		runPeriodLength = env.getInteger(DataDumperUtils.DATADUMPER_RUN_PERIOD_CONFIG,
+				DataDumperUtils.DATADUMPER_RUN_PERIOD_DEFAULT);
+		runPeriodLength = (runPeriodLength > DataDumperUtils.DATADUMPER_RUN_PERIOD_DEFAULT) ? 
+				runPeriodLength : DataDumperUtils.DATADUMPER_RUN_PERIOD_DEFAULT;
+		
 	}
 	
 	private void initialize() {
@@ -63,16 +77,86 @@ public class DataDumper implements TimerRunnable {
 		}
 	}
 	
-	private void clearExpiredKeys() {
-		// TOOD
-	}
-	
+	/**
+	 * dump the statistical information from Redis to MySQL
+	 */
 	private void dump() {
-		// TODO
+		Date nowTime = new Date();
+		Long currentTimeSliceIndex = nowTime.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
+		Long startTimeSliceIndex;
+		
+		String lastDumpTimeSlice = (String) template.opsForValue().get(DataDumperUtils.KEY_LAST_DUMP_TIME_SLICE);
+		if (lastDumpTimeSlice != null) {
+			try {
+				Date lastDumpDate = CommonUtils.DATE_COMPACT_FORMAT.parse(lastDumpTimeSlice);
+				startTimeSliceIndex = lastDumpDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH + 1;
+			} catch (ParseException ex) {
+				logger.error(String.format("The last dump time is invalid, quit to dump", lastDumpTimeSlice));
+				return;
+			}	
+		} else {
+			startTimeSliceIndex = (nowTime.getTime() - runPeriodLength*60*1000)/AnalyzerUtils.TIME_SLICE_LENGTH;
+		}
+		
+		for (long index = startTimeSliceIndex; index < currentTimeSliceIndex; index++) {
+			Date sliceDate = new Date(index*AnalyzerUtils.TIME_SLICE_LENGTH);
+			dump(CommonUtils.DATE_COMPACT_FORMAT.format(sliceDate));
+		}
+		
+		// update the last dump time slice in redis
+		Date dumpTime = new Date(currentTimeSliceIndex*AnalyzerUtils.TIME_SLICE_LENGTH);
+		template.boundValueOps(DataDumperUtils.KEY_LAST_DUMP_TIME_SLICE).set(CommonUtils.DATE_COMPACT_FORMAT.format(dumpTime));
 	}
 	
+	/**
+	 * dump all the keys whose names are matched to the given time slice
+	 * @param timeSlice format: yyyyMMddHHmm00
+	 */
+	public void dump(String timeSlice) {
+		String sliceKeysPattern = String.format("*-%s", timeSlice.trim());
+		Set<String> sliceKeys = template.keys(sliceKeysPattern);
+		
+		for (String sliceKey : sliceKeys) {
+			ApiStatData apiStatData = new ApiStatData();
+			
+			// get apiId and startTime
+			String[] strArray = sliceKey.split("-");
+			Integer apiId = Integer.valueOf(strArray[0]);
+			apiStatData.setApiId(apiId);
+			try {
+				Date sliceStartTime = CommonUtils.DATE_COMPACT_FORMAT.parse(strArray[1]);
+				apiStatData.setStartTime(sliceStartTime);
+			} catch (ParseException e) {
+				logger.error(String.format("Redis key [%s] is invalid", sliceKey));
+				continue;
+			}
+			
+			// get other fields
+			Map<String, Integer> statDataMap = Maps.newHashMap();
+			Map<Object, Object> sliceHash = template.boundHashOps(sliceKey).entries();
+			for (Map.Entry<Object, Object> entry : sliceHash.entrySet()) {
+				String entryKey = (String) entry.getKey();
+				Integer entryValue = Integer.parseInt((String) entry.getValue());
+				statDataMap.put(entryKey, entryValue);
+			}
+			
+			try {
+				BeanUtils.populate(apiStatData, statDataMap);
+			} catch (IllegalAccessException | InvocationTargetException ex) {
+				logger.error("fail to transform the hash to ApiStatData");
+				continue;
+			} 
+			
+			// dump the current slice
+			try {
+				apiStatDataMapper.insertSelective(apiStatData);
+			} catch (Exception ex) {
+				logger.warn("The API stat data to be inserted has already existed.");
+			}
+		}
+	}
 
-	//@Scheduled(initialDelay=5000, fixedDelay=5000)
+	@Scheduled(initialDelay=1000, fixedDelay=5000)
 	@Override
 	public void runTimerTask() {
 		// create and start the data dumper thread
@@ -80,7 +164,7 @@ public class DataDumper implements TimerRunnable {
 			initialize();
 			
 			dataDumperThread = new Thread(dataDumperRunner);
-			dataDumperThread.setName(DATA_DUMPER_NAME);
+			dataDumperThread.setName(DataDumperUtils.DATA_DUMPER_NAME);
 			
 			logger.info(String.format("start the data dumper thread [%s]", dataDumperThread.getName()));
 			dataDumperThread.start();
@@ -93,7 +177,7 @@ public class DataDumper implements TimerRunnable {
 			
 			// create a new data dumper thread, and start it
 			dataDumperThread = new Thread(dataDumperRunner);
-			dataDumperThread.setName(DATA_DUMPER_NAME);
+			dataDumperThread.setName(DataDumperUtils.DATA_DUMPER_NAME);
 			dataDumperThread.start();
 		}
 	}
@@ -127,14 +211,18 @@ public class DataDumper implements TimerRunnable {
 			
 			while (!shouldStop()) {
 				Date startDate = new Date();
-				
-				// TODO
-				
+				dump();
 				Date endDate = new Date();
-				logger.info(String.format("complete the rounite data dumping (start time: %s; end time: %s)", 
-						DATE_FORMAT.format(startDate), DATE_FORMAT.format(endDate)));
+				logger.info(String.format("complete the routine data dumping (start time: %s; end time: %s)", 
+						CommonUtils.DATE_NORMAL_FORMAT.format(startDate), CommonUtils.DATE_NORMAL_FORMAT.format(endDate)));
 				
-				long sleepTime = endDate.getTime() - startDate.getTime(); // TODO: modify
+				long sleepTime = runPeriodLength*60*1000 - (endDate.getTime() - startDate.getTime());
+				if (sleepTime <= 0) {
+					logger.warn(String.format("The value of configuratioin [%s] is too small, increase it please", 
+							DataDumperUtils.DATADUMPER_RUN_PERIOD_CONFIG));
+					continue;
+				}
+				
 				try {
 					Thread.sleep(sleepTime);
 				} catch (InterruptedException ex) {
