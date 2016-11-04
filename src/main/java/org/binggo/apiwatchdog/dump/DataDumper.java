@@ -53,6 +53,8 @@ public class DataDumper implements TimerRunnable {
 	private DataDumperRunner dataDumperRunner;
 	
 	private String zkConnString;  // zookeeper connection string
+	private CuratorFramework zkClient;
+	private LeaderLatch leaderLatch;
 	
 	@Autowired
 	private ApiStatDataMapper apiStatDataMapper;
@@ -73,10 +75,30 @@ public class DataDumper implements TimerRunnable {
 				runPeriodLength : DataDumperUtils.DATADUMPER_RUN_PERIOD_DEFAULT;
 		
 		zkConnString = env.getString(DataDumperUtils.ZK_CONNECT_CONFIG, DataDumperUtils.ZK_CONNECT_DEFAULT);
+		
+		zkClient = CuratorFrameworkFactory.newClient(zkConnString, 
+				DataDumperUtils.ZK_SESSION_TIMEOUT*1000,
+				DataDumperUtils.ZK_CONNECTION_TIMEOUT*1000,
+				new ExponentialBackoffRetry(DataDumperUtils.ZK_BASE_SLEEP_TIME*1000, DataDumperUtils.ZK_MAX_RETRY));
+		
+		leaderLatch = new LeaderLatch(zkClient, DataDumperUtils.ZK_LEADER_PATH);
 	}
 	
 	private void initialize() {
 		if (!initialized) {
+			// add a listener to the leader latch
+			LeaderLatchListener listener = new LeaderLatchListener() {
+				@Override
+				public void isLeader() {
+					logger.info("get the leadership");
+				}
+				@Override
+				public void notLeader() {
+					logger.info("fail to get the leadership");
+				}
+			};
+			leaderLatch.addListener(listener);
+			
 			dataDumperRunner = new DataDumperRunner();
 			
 			initialized = true;
@@ -162,13 +184,26 @@ public class DataDumper implements TimerRunnable {
 		}
 	}
 
-	@Scheduled(initialDelay=1000, fixedDelay=5000)
+	@Scheduled(initialDelay=1000, fixedDelay=10000)
 	@Override
 	public void runTimerTask() {
 		// create and start the data dumper thread
 		if (dataDumperThread == null) {
 			initialize();
-			
+
+			// start the leader latch
+			zkClient.start();
+			try {
+				leaderLatch.start();
+			} catch (Exception e) {
+				CloseableUtils.closeQuietly(zkClient);
+				CloseableUtils.closeQuietly(leaderLatch);
+				logger.error("fail to start the leader latch");
+				dataDumperRunner.setShouldStop(true);
+				return;
+			}
+						
+			// start the dumper thread
 			dataDumperThread = new Thread(dataDumperRunner);
 			dataDumperThread.setName(DataDumperUtils.DATA_DUMPER_NAME);
 			
@@ -208,24 +243,29 @@ public class DataDumper implements TimerRunnable {
 	}
 	
 	private class DataDumperRunner extends WatchdogRunner {
-		
-		private CuratorFramework zkClient;
-		private LeaderLatch leaderLatch;
-		
-		public DataDumperRunner() {
-			zkClient = CuratorFrameworkFactory.newClient(zkConnString, 
-					new ExponentialBackoffRetry(DataDumperUtils.ZK_BASE_SLEEP_TIME*1000, DataDumperUtils.ZK_MAX_RETRY));
+
+		public DataDumperRunner() {}
+
+		@Override
+		public void run() {
+			// wait the result of leader election for a while
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				
+			}
+			logger.info(String.format("Thread [%s] is running.", Thread.currentThread().getName()));
 			
-			leaderLatch = new LeaderLatch(zkClient, DataDumperUtils.ZK_LEADER_PATH);
-		}
-		
-		private void runDumpRunner() {
 			while (!shouldStop()) {
 				Date startDate = new Date();
-				dump();
+				// only the leader can do the dump task
+				if (leaderLatch.hasLeadership()) {
+					logger.debug("I'm a leader now, start to dump");
+					dump();
+				} else {
+					logger.debug("I'm not the leader now");
+				}
 				Date endDate = new Date();
-				logger.info(String.format("complete the routine data dumping (start time: %s; end time: %s)", 
-						CommonUtils.DATE_NORMAL_FORMAT.format(startDate), CommonUtils.DATE_NORMAL_FORMAT.format(endDate)));
 				
 				long sleepTime = runPeriodLength*60*1000 - (endDate.getTime() - startDate.getTime());
 				if (sleepTime <= 0) {
@@ -241,38 +281,6 @@ public class DataDumper implements TimerRunnable {
 					logger.warn("Thread [%s] has been interrupted while sleeping. Exiting.", 
 							Thread.currentThread().getName());
 				}
-			}
-		}
-
-		@Override
-		public void run() {
-			logger.info(String.format("Thread [%s] is running.", Thread.currentThread().getName()));
-			
-			// add a listener to the leader latch
-			LeaderLatchListener listener = new LeaderLatchListener() {
-				@Override
-				public void isLeader() {
-					logger.info("get the leadership");
-					runDumpRunner();
-				}
-
-				@Override
-				public void notLeader() {
-					logger.info("fail to get the leadership, quit");
-					setShouldStop(true);
-				}
-			};
-			leaderLatch.addListener(listener);
-			
-			// start
-			zkClient.start();
-			try {
-				leaderLatch.start();
-			} catch (Exception e) {
-				CloseableUtils.closeQuietly(zkClient);
-				CloseableUtils.closeQuietly(leaderLatch);
-				
-				leaderLatch.removeListener(listener);
 			}
 			
 			logger.info(String.format("Thread [%s] has been stoped.", Thread.currentThread().getName()));

@@ -16,6 +16,9 @@ public class DataDumperUtils {
 	public static final String ZK_CONNECT_CONFIG = "zookeeper.connect";
 	public static final String ZK_CONNECT_DEFAULT = "";
 	
+	public static final Integer ZK_SESSION_TIMEOUT = 60; // seconds
+	public static final Integer ZK_CONNECTION_TIMEOUT = 6; // seconds
+	
 	public static final Integer ZK_MAX_RETRY = 3;
 	public static final Integer ZK_BASE_SLEEP_TIME = 5; // seconds
 	public static final String ZK_LEADER_PATH = "/apiwatchdog/leader";
