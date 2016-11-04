@@ -40,13 +40,27 @@
 	    <version>1.4.1.RELEASE</version>
     </dependency>
     
-    <!-- kafka and zookeeper -->
+    <!-- kafka -->
     <dependency>
 	    <groupId>org.apache.kafka</groupId>
 	    <artifactId>kafka-clients</artifactId>
 	    <version>0.9.0.0</version>
 	</dependency>
 	
+	<!-- zookeeper -->
+	<dependency>
+		<groupId>org.apache.curator</groupId>
+		<artifactId>curator-framework</artifactId>
+		<version>3.2.0</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>org.apache.curator</groupId>
+		<artifactId>curator-recipes</artifactId>
+		<version>3.2.0</version>
+	</dependency>
+	
+	<!--
 	<dependency>
 	    <groupId>org.apache.zookeeper</groupId>
 	    <artifactId>zookeeper</artifactId>
@@ -58,6 +72,7 @@
 		</exclusions>
 	    <version>3.4.8</version>
     </dependency>
+    -->
 
     <!-- mysql, mybatis and paging -->
     <dependency>

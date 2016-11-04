@@ -19,6 +19,12 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.converters.IntegerConverter;
 
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.leader.LeaderLatch;
+import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
+import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.curator.utils.CloseableUtils;
 import org.binggo.apiwatchdog.TimerRunnable;
 import org.binggo.apiwatchdog.WatchdogRunner;
 import org.binggo.apiwatchdog.common.CommonUtils;
@@ -46,14 +52,13 @@ public class DataDumper implements TimerRunnable {
 	private Thread dataDumperThread;
 	private DataDumperRunner dataDumperRunner;
 	
+	private String zkConnString;  // zookeeper connection string
+	
 	@Autowired
 	private ApiStatDataMapper apiStatDataMapper;
 	
 	@Autowired
 	private StringRedisTemplate template;
-	
-	@Autowired
-	private ZKHelper zkHelper;
 	
 	static {
 		// support to transform the hash in Redis to ApiStatData object
@@ -67,6 +72,7 @@ public class DataDumper implements TimerRunnable {
 		runPeriodLength = (runPeriodLength > DataDumperUtils.DATADUMPER_RUN_PERIOD_DEFAULT) ? 
 				runPeriodLength : DataDumperUtils.DATADUMPER_RUN_PERIOD_DEFAULT;
 		
+		zkConnString = env.getString(DataDumperUtils.ZK_CONNECT_CONFIG, DataDumperUtils.ZK_CONNECT_DEFAULT);
 	}
 	
 	private void initialize() {
@@ -203,12 +209,17 @@ public class DataDumper implements TimerRunnable {
 	
 	private class DataDumperRunner extends WatchdogRunner {
 		
-		public DataDumperRunner() {}
-
-		@Override
-		public void run() {
-			logger.info(String.format("Thread [%s] is running.", Thread.currentThread().getName()));
+		private CuratorFramework zkClient;
+		private LeaderLatch leaderLatch;
+		
+		public DataDumperRunner() {
+			zkClient = CuratorFrameworkFactory.newClient(zkConnString, 
+					new ExponentialBackoffRetry(DataDumperUtils.ZK_BASE_SLEEP_TIME*1000, DataDumperUtils.ZK_MAX_RETRY));
 			
+			leaderLatch = new LeaderLatch(zkClient, DataDumperUtils.ZK_LEADER_PATH);
+		}
+		
+		private void runDumpRunner() {
 			while (!shouldStop()) {
 				Date startDate = new Date();
 				dump();
@@ -230,6 +241,38 @@ public class DataDumper implements TimerRunnable {
 					logger.warn("Thread [%s] has been interrupted while sleeping. Exiting.", 
 							Thread.currentThread().getName());
 				}
+			}
+		}
+
+		@Override
+		public void run() {
+			logger.info(String.format("Thread [%s] is running.", Thread.currentThread().getName()));
+			
+			// add a listener to the leader latch
+			LeaderLatchListener listener = new LeaderLatchListener() {
+				@Override
+				public void isLeader() {
+					logger.info("get the leadership");
+					runDumpRunner();
+				}
+
+				@Override
+				public void notLeader() {
+					logger.info("fail to get the leadership, quit");
+					setShouldStop(true);
+				}
+			};
+			leaderLatch.addListener(listener);
+			
+			// start
+			zkClient.start();
+			try {
+				leaderLatch.start();
+			} catch (Exception e) {
+				CloseableUtils.closeQuietly(zkClient);
+				CloseableUtils.closeQuietly(leaderLatch);
+				
+				leaderLatch.removeListener(listener);
 			}
 			
 			logger.info(String.format("Thread [%s] has been stoped.", Thread.currentThread().getName()));
