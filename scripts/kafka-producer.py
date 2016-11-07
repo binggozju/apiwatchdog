@@ -1,25 +1,39 @@
-#!/usr/bin/python
+#!/usr/bin/python                                                                                    
 
 import sys
-from pykafka import kafkaClient
+import json
+from pykafka import KafkaClient
 
 topic_name = "apiwatchdog-apicall"
-kafka_hosts = "127.0.0.1:9092,127.0.0.1:9093"
-zk_hosts = "127.0.0.1:2181"
-
-#kafka_hosts = "10.168.72.226:9092,10.168.76.90:9092,10.168.59.183:9092"
-#zk_hosts = "10.168.72.226:2181,10.168.76.90:2181,10.168.59.183:2181"
+kafka_hosts = "192.168.106.129:9092,192.168.106.129:9093"
+zk_hosts = "192.168.106.129:2181"
 
 def main():
+    api_call = {"apiId": 2,
+                "callUuid": "49E4D4B2-3F5D-5EF5-E4FF-5E24DAC1BA5E",
+                "requestTime": "2016-11-07 10:46:32",
+                "responseTime": "2016-11-07 10:46:35",
+                "httpResponseCode": "200",
+                "apiReturnCode": "99999",
+                "apiReturnMessage": "internal error",
+                "sourceService": "mockservice",
+                "sourceHost": "", 
+                "destService": "", 
+                "destHost": "", 
+                "requestBody": "", 
+                "responseBody": ""
+            }   
+    api_call_str = json.dumps(api_call)
+    print api_call_str
+
     client = KafkaClient(hosts=kafka_hosts)
     topic = client.topics[topic_name]
-    print "now you can send message to topic '%s'" % (topic_name)
+    
     with topic.get_sync_producer() as producer:
-        while True:
-            msg = raw_input(">> ")
-            producer.produce(msg)
+        producer.produce(api_call_str)
+    
+    print "send %s" % (api_call)
 
 
 if __name__ == "__main__":
     sys.exit(main())
-

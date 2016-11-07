@@ -79,7 +79,7 @@ public class KafkaAgent implements TimerRunnable {
 		}
 	}
 	
-	//@Scheduled(initialDelay=1000, fixedDelay=5*1000)
+	@Scheduled(initialDelay=1000, fixedDelay=5*1000)
 	@Override
 	public void runTimerTask() {
 		// create the consumer threads
@@ -169,7 +169,7 @@ public class KafkaAgent implements TimerRunnable {
 					Thread.currentThread().getName()));
 				
 				while (!shouldStop()) {
-					ConsumerRecords<String, String> records = consumer.poll(KafkaAgentHelper.FETCH_DATA_TIMEOUT*1000);
+					ConsumerRecords<String, String> records = consumer.poll(500);
 					for (ConsumerRecord<String, String> record : records) {
 						try {
 							ApiCall apiCall = gson.fromJson(record.value(), ApiCall.class);

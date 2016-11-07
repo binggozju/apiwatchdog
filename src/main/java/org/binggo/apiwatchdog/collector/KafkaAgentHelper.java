@@ -20,13 +20,12 @@ public class KafkaAgentHelper {
 	public static final String KAFKA_CONSUMER_NUM_CONFIG = "kafka.consumer.num";
 	public static final Integer KAFKA_CONSUMER_NUM_DEFAULT = 2;
 	
-	public static final Long FETCH_DATA_TIMEOUT = 10L;  // seconds
-	
 	public static final String CONSUMER_THREAD_NAME_DEFAUTL = "Kafka-Consumer";
 	
 	// generate a default kafka properties
 	public static Properties getDefaultProperties() {
 		Properties props = new Properties();
+		props.put("enable.auto.commit", "true");
 		props.put("auto.commit.interval.ms", "1000");
 		props.put("session.timeout.ms", "30000");
 		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
