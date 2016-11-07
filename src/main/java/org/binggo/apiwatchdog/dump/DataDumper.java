@@ -113,17 +113,17 @@ public class DataDumper implements TimerRunnable {
 		Long currentTimeSliceIndex = nowTime.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		Long startTimeSliceIndex;
 		
-		String lastDumpTimeSlice = (String) template.opsForValue().get(DataDumperUtils.KEY_LAST_DUMP_TIME_SLICE);
-		if (lastDumpTimeSlice != null) {
+		String nextDumpTimeSlice = (String) template.opsForValue().get(DataDumperUtils.KEY_NEXT_DUMP_TIME_SLICE);
+		if (nextDumpTimeSlice != null) {
 			try {
-				Date lastDumpDate = CommonUtils.DATE_COMPACT_FORMAT.parse(lastDumpTimeSlice);
-				startTimeSliceIndex = lastDumpDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH + 1;
+				Date nextDumpDate = CommonUtils.DATE_COMPACT_FORMAT.parse(nextDumpTimeSlice);
+				startTimeSliceIndex = nextDumpDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 			} catch (ParseException ex) {
-				logger.error(String.format("The last dump time is invalid, quit to dump", lastDumpTimeSlice));
+				logger.error(String.format("The last dump time is invalid, quit to dump", nextDumpTimeSlice));
 				return;
 			}	
 		} else {
-			startTimeSliceIndex = (nowTime.getTime() - runPeriodLength*60*1000)/AnalyzerUtils.TIME_SLICE_LENGTH;
+			startTimeSliceIndex = (nowTime.getTime() - 2*runPeriodLength*60*1000)/AnalyzerUtils.TIME_SLICE_LENGTH;
 		}
 		
 		for (long index = startTimeSliceIndex; index < currentTimeSliceIndex; index++) {
@@ -133,7 +133,7 @@ public class DataDumper implements TimerRunnable {
 		
 		// update the last dump time slice in redis
 		Date dumpTime = new Date(currentTimeSliceIndex*AnalyzerUtils.TIME_SLICE_LENGTH);
-		template.boundValueOps(DataDumperUtils.KEY_LAST_DUMP_TIME_SLICE).set(CommonUtils.DATE_COMPACT_FORMAT.format(dumpTime));
+		template.boundValueOps(DataDumperUtils.KEY_NEXT_DUMP_TIME_SLICE).set(CommonUtils.DATE_COMPACT_FORMAT.format(dumpTime));
 	}
 	
 	/**
@@ -250,7 +250,7 @@ public class DataDumper implements TimerRunnable {
 		public void run() {
 			// wait the result of leader election for a while
 			try {
-				Thread.sleep(500);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				
 			}
@@ -262,6 +262,7 @@ public class DataDumper implements TimerRunnable {
 				if (leaderLatch.hasLeadership()) {
 					logger.debug("I'm a leader now, start to dump");
 					dump();
+					logger.debug("complete the routine dump task");
 				} else {
 					logger.debug("I'm not the leader now");
 				}

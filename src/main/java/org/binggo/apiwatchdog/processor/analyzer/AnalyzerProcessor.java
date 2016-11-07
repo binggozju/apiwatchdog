@@ -89,9 +89,9 @@ public class AnalyzerProcessor extends WatchdogProcessor {
 			template.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_RESPTIME_TOTAL, respTime);
 			template.boundHashOps(redisKeyName).increment(AnalyzerUtils.getRespTimeKey(respTime), 1);
 			
-			if (!apiCall.getHttpReponseCode().equals("200")) {
+			if (apiCall.getHttpResponseCode() != null && !apiCall.getHttpResponseCode().equals("200")) {
 				template.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_COUNT_NOT200, 1);
-			} else if (!apiCall.getApiReturnCode().equals("0")) {
+			} else if (apiCall.getApiReturnCode() != null && !apiCall.getApiReturnCode().equals("0")) {
 				template.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_200_NOT0, 1);
 			}
 			

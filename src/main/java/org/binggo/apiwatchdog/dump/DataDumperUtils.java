@@ -9,7 +9,7 @@ public class DataDumperUtils {
 	
 	
 	// redis
-	public static final String KEY_LAST_DUMP_TIME_SLICE = "lastDumpTimeSlice";
+	public static final String KEY_NEXT_DUMP_TIME_SLICE = "nextDumpTimeSlice";
 	
 	
 	// zookeeper

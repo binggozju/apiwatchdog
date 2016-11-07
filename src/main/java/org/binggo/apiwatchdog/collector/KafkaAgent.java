@@ -175,7 +175,7 @@ public class KafkaAgent implements TimerRunnable {
 							ApiCall apiCall = gson.fromJson(record.value(), ApiCall.class);
 							collector.collect(Event.buildEvent(apiCall));
 						} catch (JsonSyntaxException ex) {
-							logger.error(String.format("the api call of json format is invalid: %s", record.value()));
+							logger.error(String.format("api call of json format invalid: %s", ex.getMessage()));
 							continue;
 						}	
 					}

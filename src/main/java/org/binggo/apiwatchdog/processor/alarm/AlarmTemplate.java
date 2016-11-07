@@ -38,7 +38,7 @@ public class AlarmTemplate {
 			
 		case ALARM_REASON_NOT_HTTP200:
 			return String.format("[HTTP响应码非200告警] API（id为%d）在%s时间收到来自%s的一次调用（调用id为%s）的HTTP响应码为%s",
-					apiId, requestTime, source, apiCallUuid, apiCall.getHttpReponseCode());
+					apiId, requestTime, source, apiCallUuid, apiCall.getHttpResponseCode());
 			
 		case ALARM_REASON_NOT_RETCODE0:
 			return String.format("[返回码非0告警] API（id为%d）在%s时间收到来自%s的一次调用（调用id为%s）的调用返回码为%s",

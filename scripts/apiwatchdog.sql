@@ -10,7 +10,7 @@ CREATE TABLE `api_bad_call` (
   `call_uuid` varchar(40) NOT NULL COMMENT 'api调用的uuid',
   `request_time` datetime NOT NULL COMMENT '发起request的时间',
   `response_time` datetime DEFAULT NULL COMMENT '收到response的时间',
-  `http_reponse_code` varchar(3) DEFAULT '' COMMENT 'response中的http响应码',
+  `http_response_code` varchar(3) DEFAULT '' COMMENT 'response中的http响应码',
   `api_return_code` varchar(12) DEFAULT '' COMMENT 'response中的api返回码',
   `api_return_message` varchar(128) DEFAULT '' COMMENT 'response中的api返回码的解释文本',
   `source_service` varchar(64) NOT NULL COMMENT '发起api调用的服务的名称',

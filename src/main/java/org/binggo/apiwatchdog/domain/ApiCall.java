@@ -15,7 +15,7 @@ public class ApiCall {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     private Date responseTime;
 
-    private String httpReponseCode;
+    private String httpResponseCode;
 
     private String apiReturnCode;
 
@@ -57,12 +57,12 @@ public class ApiCall {
         this.responseTime = responseTime;
     }
 
-    public String getHttpReponseCode() {
-        return httpReponseCode;
+    public String getHttpResponseCode() {
+        return httpResponseCode;
     }
 
-    public void setHttpReponseCode(String httpReponseCode) {
-        this.httpReponseCode = httpReponseCode == null ? null : httpReponseCode.trim();
+    public void setHttpResponseCode(String httpResponseCode) {
+        this.httpResponseCode = httpResponseCode == null ? null : httpResponseCode.trim();
     }
 
     public String getApiReturnCode() {

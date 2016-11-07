@@ -126,13 +126,15 @@ public class Config implements TimerRunnable {
 			}	
 		}
 		// check the response code of HTTP
-		if (!apiCall.getHttpReponseCode().equals("200") && apiConfMap.get(apiId).getMetricNot200() != 0) {
+		if (apiCall.getHttpResponseCode() != null && !apiCall.getHttpResponseCode().equals("200") 
+				&& apiConfMap.get(apiId).getMetricNot200() != 0) {
 			event.addHeader(AlarmTemplate.ALARM_REASON_KEY, AlarmTemplate.ALARM_REASON_NOT_HTTP200);
 			confRWLock.readLock().unlock();
 			return true;
 		}
 		// check the return code
-		/*if (!apiCall.getApiReturnCode().equals("0") && apiConfMap.get(apiId).getMetric200Not0() != 0) {
+		/*if (apiCall.getApiReturnCode() != null && !apiCall.getApiReturnCode().equals("0") 
+		 		&& apiConfMap.get(apiId).getMetric200Not0() != 0) {
 			event.addHeader(AlarmTemplate.ALARM_REASON_KEY, AlarmTemplate.ALARM_REASON_NOT_RETCODE0);
 			confRWLock.readLock().unlock();
 			return true;

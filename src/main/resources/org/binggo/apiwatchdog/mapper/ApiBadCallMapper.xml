@@ -6,7 +6,7 @@
     <result column="call_uuid" property="callUuid" jdbcType="VARCHAR" />
     <result column="request_time" property="requestTime" jdbcType="TIMESTAMP" />
     <result column="response_time" property="responseTime" jdbcType="TIMESTAMP" />
-    <result column="http_reponse_code" property="httpReponseCode" jdbcType="VARCHAR" />
+    <result column="http_response_code" property="httpResponseCode" jdbcType="VARCHAR" />
     <result column="api_return_code" property="apiReturnCode" jdbcType="VARCHAR" />
     <result column="api_return_message" property="apiReturnMessage" jdbcType="VARCHAR" />
     <result column="source_service" property="sourceService" jdbcType="VARCHAR" />
@@ -20,12 +20,12 @@
   <insert id="insert" parameterType="org.binggo.apiwatchdog.domain.ApiCall" useGeneratedKeys="true" keyProperty="id">
   	insert into api_bad_call (
   		api_id, call_uuid, request_time, response_time, 
-      	http_reponse_code, api_return_code, api_return_message, 
+      	http_response_code, api_return_code, api_return_message, 
       	source_service, source_host, dest_service, 
       	dest_host, request_body, response_body
      ) values (
      	#{apiId,jdbcType=INTEGER}, #{callUuid,jdbcType=VARCHAR}, #{requestTime,jdbcType=TIMESTAMP}, #{responseTime,jdbcType=TIMESTAMP}, 
-      	#{httpReponseCode,jdbcType=VARCHAR}, #{apiReturnCode,jdbcType=VARCHAR}, #{apiReturnMessage,jdbcType=VARCHAR}, 
+      	#{httpResponseCode,jdbcType=VARCHAR}, #{apiReturnCode,jdbcType=VARCHAR}, #{apiReturnMessage,jdbcType=VARCHAR}, 
       	#{sourceService,jdbcType=VARCHAR}, #{sourceHost,jdbcType=VARCHAR}, #{destService,jdbcType=VARCHAR}, 
       	#{destHost,jdbcType=VARCHAR}, #{requestBody,jdbcType=VARCHAR}, #{responseBody,jdbcType=VARCHAR}
     )

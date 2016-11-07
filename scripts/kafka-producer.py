@@ -5,7 +5,7 @@ import json
 from pykafka import KafkaClient
 
 topic_name = "apiwatchdog-apicall"
-kafka_hosts = "192.168.106.129:9092,192.168.106.129:9093"
+kafka_hosts = "192.168.106.129:9092"
 zk_hosts = "192.168.106.129:2181"
 
 def main():
