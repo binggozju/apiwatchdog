@@ -13,7 +13,7 @@ public abstract class WatchdogCollector implements Collector, TimerRunnable {
 	
 	protected Processor processor;
 	
-	public WatchdogCollector(String name) {
+	protected WatchdogCollector(String name) {
 		this.name = name;
 	}
 	

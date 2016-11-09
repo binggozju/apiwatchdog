@@ -182,7 +182,7 @@ public class Config implements TimerRunnable {
 	/**
 	 * refresh the configuration of API providers and API from MySQL
 	 */
-	@Scheduled(initialDelay=500, fixedDelay=5*60*1000)
+	@Scheduled(initialDelay=500, fixedDelay=3*60*1000)
 	@Override
 	public void runTimerTask() {
 		while (apiProviderMapper == null || apiItemMapper == null) {

@@ -56,7 +56,7 @@ public class AnalyzerUtils {
 	
 	
 	// length of the time slice for analysis and statistics
-	public static final Integer TIME_SLICE_LENGTH = 5*60*1000; // 5 minutes
+	public static final Integer TIME_SLICE_LENGTH = 5*60*1000; // milliseconds
 	
 	public static String getTimeSlice(Date date) {
 		Long longStartOfSlice = (date.getTime()/TIME_SLICE_LENGTH) * TIME_SLICE_LENGTH;

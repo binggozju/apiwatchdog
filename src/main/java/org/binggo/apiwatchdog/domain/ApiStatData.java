@@ -40,6 +40,14 @@ public class ApiStatData {
     private Integer resptime11s12s;
 
     private Integer resptime12sMax;
+    
+    public ApiStatData() {
+    	countTotal = countTimeout = countNot200 = count200Not0 = resptimeTotal
+    			= resptime0s1s = resptime1s2s = resptime2s3s = resptime3s4s
+    			= resptime4s5s = resptime5s6s = resptime6s7s = resptime7s8s
+    			= resptime8s9s = resptime10s11s = resptime11s12s = resptime12sMax
+    			= 0;
+    }
 
     public Integer getApiId() {
         return apiId;

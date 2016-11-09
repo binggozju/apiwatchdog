@@ -163,4 +163,16 @@
     </trim>
   </insert>
   
+  <select id="getDataByTime" resultMap="BaseResultMap">
+  	select * from api_stat_data
+  	where 
+  		start_time &gt;= #{startDate,jdbcType=TIMESTAMP} 
+  	and 
+  		start_time &lt; #{endDate,jdbcType=TIMESTAMP}
+  	and
+  		api_id = #{apiId} 
+  	order by 
+  		start_time asc
+  </select>
+  
 </mapper>

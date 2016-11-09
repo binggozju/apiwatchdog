@@ -10,7 +10,7 @@ public abstract class WatchdogRunner implements Runnable {
 		shouldStop.set(stop);
 	}
 	
-	public Boolean shouldStop() {
+	public boolean shouldStop() {
 		return shouldStop.get();
 	}
 	

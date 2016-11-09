@@ -106,13 +106,14 @@ public class DataDumper implements TimerRunnable {
 	}
 	
 	/**
-	 * dump the statistical information from Redis to MySQL
+	 * dump the statistical information between the nextDumpTimeSlice and now from Redis to MySQL
 	 */
 	private void dump() {
 		Date nowTime = new Date();
-		Long currentTimeSliceIndex = nowTime.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
-		Long startTimeSliceIndex;
+		long endTimeSliceIndex = nowTime.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
+		long startTimeSliceIndex;
 		
+		// get nextDumpTimeSlice for computing the startTimeSliceIndex
 		String nextDumpTimeSlice = (String) template.opsForValue().get(DataDumperUtils.KEY_NEXT_DUMP_TIME_SLICE);
 		if (nextDumpTimeSlice != null) {
 			try {
@@ -126,13 +127,13 @@ public class DataDumper implements TimerRunnable {
 			startTimeSliceIndex = (nowTime.getTime() - 2*runPeriodLength*60*1000)/AnalyzerUtils.TIME_SLICE_LENGTH;
 		}
 		
-		for (long index = startTimeSliceIndex; index < currentTimeSliceIndex; index++) {
-			Date sliceDate = new Date(index*AnalyzerUtils.TIME_SLICE_LENGTH);
+		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
+			Date sliceDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
 			dump(CommonUtils.DATE_COMPACT_FORMAT.format(sliceDate));
 		}
 		
 		// update the last dump time slice in redis
-		Date dumpTime = new Date(currentTimeSliceIndex*AnalyzerUtils.TIME_SLICE_LENGTH);
+		Date dumpTime = new Date(endTimeSliceIndex * AnalyzerUtils.TIME_SLICE_LENGTH);
 		template.boundValueOps(DataDumperUtils.KEY_NEXT_DUMP_TIME_SLICE).set(CommonUtils.DATE_COMPACT_FORMAT.format(dumpTime));
 	}
 	

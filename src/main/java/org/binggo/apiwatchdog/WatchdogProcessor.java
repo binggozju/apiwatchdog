@@ -29,7 +29,7 @@ public abstract class WatchdogProcessor implements Processor, TimerRunnable {
 	
 	private AtomicBoolean initialized = new AtomicBoolean(false);
 	
-	public WatchdogProcessor(String name) {
+	protected WatchdogProcessor(String name) {
 		this.name = name;
 		this.runnerMap = Maps.newHashMap();
 	}
@@ -126,7 +126,7 @@ public abstract class WatchdogProcessor implements Processor, TimerRunnable {
 		}
 	}
 	
-	protected Boolean isInitialized() {
+	protected boolean isInitialized() {
 		return initialized.get();
 	}
 

@@ -13,6 +13,8 @@ public enum ReturnCode {
 	
 	INTERRUPTED (10, "operation has be interrupted"),
 	
+	INVALID_DATE (20, "invalid date string"),
+	
 	FAIL_LOAD_PROCESSOR (80, "fail to load the processor"),
 	FAIL_CREATE_PROCESSOR (81, "fail to create the processor"),
 	FAILURE (99, "fail"),
@@ -26,13 +28,15 @@ public enum ReturnCode {
 	
 	// return code for alarm processor module [300, 400)
 	POST_HTTP_REQUEST_FAIL (300, "fail to send the post http request"),
-	GET_HTTP_REQUEST_FAIL (301, "fail to send the get http request");
+	GET_HTTP_REQUEST_FAIL (301, "fail to send the get http request"),
+	
+	// return code for statis module [400, 500)
+	STAT_DATA_NOT_FOUND (400, "statistical data not found in mysql");
 	
 	
 	// return code for processor module
 	// return code for config module
 	// return code for onlineanalyzer module
-	// return code for statis module
 	// return code for badcall module
 	
 	private final int code;
