@@ -124,7 +124,7 @@ public class DataDumper implements TimerRunnable {
 				return;
 			}	
 		} else {
-			startTimeSliceIndex = (nowTime.getTime() - 2*runPeriodLength*60*1000)/AnalyzerUtils.TIME_SLICE_LENGTH;
+			startTimeSliceIndex = (nowTime.getTime() - 3*runPeriodLength*60*1000)/AnalyzerUtils.TIME_SLICE_LENGTH;
 		}
 		
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {

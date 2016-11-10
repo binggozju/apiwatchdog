@@ -14,7 +14,7 @@ import org.binggo.apiwatchdog.Event;
 import org.binggo.apiwatchdog.WatchdogProcessor;
 import org.binggo.apiwatchdog.common.WatchdogEnv;
 import org.binggo.apiwatchdog.common.WatchdogException;
-import org.binggo.apiwatchdog.config.Config;
+import org.binggo.apiwatchdog.config.ConfigProvider;
 import org.binggo.apiwatchdog.domain.ApiCall;
 
 /**
@@ -25,7 +25,7 @@ public class AlarmProcessor extends WatchdogProcessor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AlarmProcessor.class);
 	
-	private Config config;
+	private ConfigProvider configProvider;
 	
 	private String senderUrl;
 	private HttpClientUtils httpUtils;
@@ -33,7 +33,7 @@ public class AlarmProcessor extends WatchdogProcessor {
 	private JsonParser jsonParser;
 	
 	@Autowired
-	public AlarmProcessor(WatchdogEnv env, Config config) {
+	public AlarmProcessor(WatchdogEnv env, ConfigProvider configProvider) {
 		super(AlarmConstants.PROCESSOR_NAME);
 		
 		capacity = env.getInteger(AlarmConstants.QUEUE_CAPACITY_CONFIG, AlarmConstants.QUEUE_CAPACITY_DEFAULT);
@@ -42,7 +42,7 @@ public class AlarmProcessor extends WatchdogProcessor {
 		
 		httpUtils = new HttpClientUtils();
 		jsonParser = new JsonParser();
-		this.config = config;
+		this.configProvider = configProvider;
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class AlarmProcessor extends WatchdogProcessor {
 	}
 	
 	protected boolean isPermitted(Event event) {
-		return config.shouldAlarm(event);
+		return configProvider.shouldAlarm(event);
 	}
 
 	@Override

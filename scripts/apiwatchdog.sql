@@ -88,6 +88,7 @@ CREATE TABLE `api_stat_data` (
   `resptime_6s_7s` int(10) unsigned DEFAULT '0',
   `resptime_7s_8s` int(10) unsigned DEFAULT '0',
   `resptime_8s_9s` int(10) unsigned DEFAULT '0',
+  `resptime_9s_10s` int(10) unsigned DEFAULT '0',
   `resptime_10s_11s` int(10) unsigned DEFAULT '0',
   `resptime_11s_12s` int(10) unsigned DEFAULT '0',
   `resptime_12s_max` int(10) unsigned DEFAULT '0' COMMENT '5分钟内响应时间大于12s或超时的api调用次数',

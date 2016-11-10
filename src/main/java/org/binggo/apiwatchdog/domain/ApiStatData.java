@@ -34,6 +34,8 @@ public class ApiStatData {
     private Integer resptime7s8s;
 
     private Integer resptime8s9s;
+    
+    private Integer resptime9s10s;
 
     private Integer resptime10s11s;
 
@@ -45,7 +47,8 @@ public class ApiStatData {
     	countTotal = countTimeout = countNot200 = count200Not0 = resptimeTotal
     			= resptime0s1s = resptime1s2s = resptime2s3s = resptime3s4s
     			= resptime4s5s = resptime5s6s = resptime6s7s = resptime7s8s
-    			= resptime8s9s = resptime10s11s = resptime11s12s = resptime12sMax
+    			= resptime8s9s = resptime9s10s = resptime10s11s = resptime11s12s 
+    			= resptime12sMax
     			= 0;
     }
 
@@ -177,7 +180,15 @@ public class ApiStatData {
         this.resptime8s9s = resptime8s9s;
     }
 
-    public Integer getResptime10s11s() {
+    public Integer getResptime9s10s() {
+		return resptime9s10s;
+	}
+
+	public void setResptime9s10s(Integer resptime9s10s) {
+		this.resptime9s10s = resptime9s10s;
+	}
+
+	public Integer getResptime10s11s() {
         return resptime10s11s;
     }
 

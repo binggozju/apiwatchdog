@@ -21,14 +21,14 @@ import org.binggo.apiwatchdog.mapper.ApiProviderMapper;
 import org.binggo.apiwatchdog.processor.alarm.AlarmTemplate;
 
 /**
- * Config is used to manage the configuration of API providers and corresponding API.
+ * ConfigProvider is used to manage the configuration of API providers and corresponding API.
  * @author Administrator
  *
  */
 @Component
-public class Config implements TimerRunnable {
+public class ConfigProvider implements TimerRunnable {
 	
-	private static final Logger logger = LoggerFactory.getLogger(Config.class);
+	private static final Logger logger = LoggerFactory.getLogger(ConfigProvider.class);
 	
 	@Autowired
 	private volatile ApiProviderMapper apiProviderMapper;
@@ -44,7 +44,7 @@ public class Config implements TimerRunnable {
 	private Map<Integer, ProviderConfiguration> providerConfCacheMap;
 	private Map<Integer, ApiConfiguration> apiConfCacheMap;
 	
-	public Config() {
+	public ConfigProvider() {
 		confRWLock = new ReentrantReadWriteLock();
 		
 		providerConfMap = new HashMap<Integer, ProviderConfiguration>();
