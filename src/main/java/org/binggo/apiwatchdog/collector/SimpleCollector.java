@@ -76,7 +76,7 @@ public class SimpleCollector extends WatchdogCollector {
 		processor.take(event);
 	}
 	
-	@Scheduled(initialDelay=500, fixedDelay=5000)
+	@Scheduled(initialDelay=500, fixedDelay=5*1000)
 	@Override
 	public void runTimerTask() {
 		if (collectorRunner == null) {

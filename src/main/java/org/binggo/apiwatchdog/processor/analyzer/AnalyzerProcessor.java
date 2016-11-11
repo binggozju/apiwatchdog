@@ -77,6 +77,7 @@ public class AnalyzerProcessor extends WatchdogProcessor {
 		
 		if (apiCall.getResponseTime() == null) {
 			template.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_COUNT_TIMEOUT, 1);
+			template.boundHashOps(redisKeyName).increment(AnalyzerUtils.KEY_RESPTIME_12S_MAX, 1);
 		} else {
 			int respTime = (int)(apiCall.getResponseTime().getTime() - apiCall.getRequestTime().getTime())/1000;
 			if (respTime < 0) {
@@ -98,7 +99,7 @@ public class AnalyzerProcessor extends WatchdogProcessor {
 		}
 	}
 
-	@Scheduled(initialDelay=1000, fixedDelay=3000)
+	@Scheduled(initialDelay=1000, fixedDelay=3*1000)
 	@Override
 	public void runTimerTask() {
 		if (!isInitialized()) {

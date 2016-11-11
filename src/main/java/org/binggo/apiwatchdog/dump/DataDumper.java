@@ -185,7 +185,7 @@ public class DataDumper implements TimerRunnable {
 		}
 	}
 
-	@Scheduled(initialDelay=1000, fixedDelay=10000)
+	@Scheduled(initialDelay=2*1000, fixedDelay=5*1000)
 	@Override
 	public void runTimerTask() {
 		// create and start the data dumper thread
@@ -251,7 +251,7 @@ public class DataDumper implements TimerRunnable {
 		public void run() {
 			// wait the result of leader election for a while
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(2*1000);
 			} catch (InterruptedException e) {
 				
 			}

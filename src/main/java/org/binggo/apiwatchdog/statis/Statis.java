@@ -55,6 +55,23 @@ public class Statis {
 				);
 	}
 	
+	private Date getValidDate(String dateStr) throws WatchdogException {
+		if (dateStr == null) {
+			throw new WatchdogException(ReturnCode.INVALID_DATE);
+		}
+		try {
+			Date resultDate = CommonUtils.DATE_COMPACT_FORMAT.parse(dateStr);
+			Date nowDate = new Date();
+			if (resultDate.getTime() > nowDate.getTime()) {
+				resultDate = nowDate;
+			}
+			return resultDate;
+			
+		} catch (ParseException e) {
+			throw new WatchdogException(ReturnCode.INVALID_DATE);
+		}
+	}
+	
 	//////////// provide the statistical data for a single API ////////////////
 	/**
 	 * get the time series of API call number 
@@ -67,13 +84,8 @@ public class Statis {
 			throws WatchdogException {
 		Map<String, Integer> result = Maps.newTreeMap();
 		
-		Date startDate = null, endDate = null;
-		try {
-			startDate = CommonUtils.DATE_COMPACT_FORMAT.parse(startTime);
-			endDate = CommonUtils.DATE_COMPACT_FORMAT.parse(endTime);
-		} catch (ParseException e) {
-			throw new WatchdogException(ReturnCode.INVALID_DATE);
-		}
+		Date startDate = getValidDate(startTime);
+		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
@@ -84,8 +96,9 @@ public class Statis {
 				ApiStatData apiStatData = dataCache.get(redisKeyName);
 				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), apiStatData.getCountTotal());
 			} catch (ExecutionException ex) {
+				// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
 				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 0);
-			}		
+			}
 		}
 		return result;
 	}
@@ -97,16 +110,12 @@ public class Statis {
 	 * @param endTime
 	 * @return
 	 */
-	public Map<String, Double> getApiAvailabilityTimeSeries(Integer apiId, String startTime, String endTime) {
+	public Map<String, Double> getApiAvailabilityTimeSeries(Integer apiId, String startTime, String endTime) 
+			throws WatchdogException {
 		Map<String, Double> result = Maps.newTreeMap();
 		
-		Date startDate = null, endDate = null;
-		try {
-			startDate = CommonUtils.DATE_COMPACT_FORMAT.parse(startTime);
-			endDate = CommonUtils.DATE_COMPACT_FORMAT.parse(endTime);
-		} catch (ParseException e) {
-			throw new WatchdogException(ReturnCode.INVALID_DATE);
-		}
+		Date startDate = getValidDate(startTime);
+		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
@@ -122,8 +131,9 @@ public class Statis {
 				double availablity = (apiStatData.getCountTotal() - apiStatData.getCountTimeout()) * 1.00 / apiStatData.getCountTotal();
 				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), availablity);
 			} catch (ExecutionException ex) {
+				// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
 				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 1.00);
-			}	
+			}
 		}
 		return result;
 	}
@@ -135,16 +145,12 @@ public class Statis {
 	 * @param endTime
 	 * @return
 	 */
-	public Map<String, Double> getApiAccuracyTimeSeries(Integer apiId, String startTime, String endTime) {
+	public Map<String, Double> getApiAccuracyTimeSeries(Integer apiId, String startTime, String endTime) 
+			throws WatchdogException {
 		Map<String, Double> result = Maps.newTreeMap();
 		
-		Date startDate = null, endDate = null;
-		try {
-			startDate = CommonUtils.DATE_COMPACT_FORMAT.parse(startTime);
-			endDate = CommonUtils.DATE_COMPACT_FORMAT.parse(endTime);
-		} catch (ParseException e) {
-			throw new WatchdogException(ReturnCode.INVALID_DATE);
-		}
+		Date startDate = getValidDate(startTime);
+		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
@@ -161,22 +167,19 @@ public class Statis {
 						- apiStatData.getCount200Not0()) * 1.00 / apiStatData.getCountTotal();
 				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), accuracy);
 			} catch (ExecutionException ex) {
+				// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
 				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 1.00);
 			}
 		}
 		return result;
 	}
 	
-	public Map<String, Double> getApiAvgResptimeTimeSeries(Integer apiId, String startTime, String endTime) {
+	public Map<String, Double> getApiAvgResptimeTimeSeries(Integer apiId, String startTime, String endTime) 
+			throws WatchdogException {
 		Map<String, Double> result = Maps.newTreeMap();
 		
-		Date startDate = null, endDate = null;
-		try {
-			startDate = CommonUtils.DATE_COMPACT_FORMAT.parse(startTime);
-			endDate = CommonUtils.DATE_COMPACT_FORMAT.parse(endTime);
-		} catch (ParseException e) {
-			throw new WatchdogException(ReturnCode.INVALID_DATE);
-		}
+		Date startDate = getValidDate(startTime);
+		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
@@ -193,6 +196,7 @@ public class Statis {
 				double avgResptime = resptimeTotal * 1.00 / callNumWithResp;
 				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), avgResptime);
 			} catch (ExecutionException ex) {
+				// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
 				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 0.00);
 			}
 		}
@@ -206,19 +210,15 @@ public class Statis {
 	 * @param endTime
 	 * @return
 	 */
-	public Map<String, Integer> getApiResptimeDistribution(Integer apiId, String startTime, String endTime) {
+	public Map<String, Integer> getApiResptimeDistribution(Integer apiId, String startTime, String endTime) 
+			throws WatchdogException {
 		Map<String, Integer> result = Maps.newTreeMap();
 		for (String intervalName : StatisUtils.RESP_TIME_DIVISION) {
 			result.put(intervalName, 0);
 		}
 		
-		Date startDate = null, endDate = null;
-		try {
-			startDate = CommonUtils.DATE_COMPACT_FORMAT.parse(startTime);
-			endDate = CommonUtils.DATE_COMPACT_FORMAT.parse(endTime);
-		} catch (ParseException e) {
-			throw new WatchdogException(ReturnCode.INVALID_DATE);
-		}
+		Date startDate = getValidDate(startTime);
+		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
@@ -229,6 +229,8 @@ public class Statis {
 				ApiStatData apiStatData = dataCache.get(redisKeyName);
 				StatisUtils.updateMapCounter(result, StatisUtils.getRespTimeDistribution(apiStatData));
 			} catch (ExecutionException ex) {
+				// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
+				// nothing to do
 			}		
 		}
 		return result;
@@ -236,18 +238,14 @@ public class Statis {
 	
 	
 	////// provide the statistical data for an API provider (service) //////////
-	public Map<String, Integer> getCallNumTimeSeries(Integer providerId, String startTime, String endTime) {
+	public Map<String, Integer> getCallNumTimeSeries(Integer providerId, String startTime, String endTime) 
+			throws WatchdogException {
 		Map<String, Integer> result = Maps.newTreeMap();
 		
 		List<ApiItem> apiItemList = apiItemMapper.listApiItemsByProviderId(providerId);
 		
-		Date startDate = null, endDate = null;
-		try {
-			startDate = CommonUtils.DATE_COMPACT_FORMAT.parse(startTime);
-			endDate = CommonUtils.DATE_COMPACT_FORMAT.parse(endTime);
-		} catch (ParseException e) {
-			throw new WatchdogException(ReturnCode.INVALID_DATE);
-		}
+		Date startDate = getValidDate(startTime);
+		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
@@ -260,7 +258,8 @@ public class Statis {
 					ApiStatData apiStatData = dataCache.get(redisKeyName);
 					callNum += apiStatData.getCountTotal();
 				} catch (ExecutionException ex) {
-					// nothing
+					// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
+					// nothing to do
 				}	
 			} // end of loop for apiItemList
 			
@@ -269,18 +268,14 @@ public class Statis {
 		return result;
 	}
 	
-	public Map<String, Double> getAvailabilityTimeSeries(Integer providerId, String startTime, String endTime) {
+	public Map<String, Double> getAvailabilityTimeSeries(Integer providerId, String startTime, String endTime) 
+			throws WatchdogException {
 		Map<String, Double> result = Maps.newTreeMap();
 		
 		List<ApiItem> apiItemList = apiItemMapper.listApiItemsByProviderId(providerId);
 		
-		Date startDate = null, endDate = null;
-		try {
-			startDate = CommonUtils.DATE_COMPACT_FORMAT.parse(startTime);
-			endDate = CommonUtils.DATE_COMPACT_FORMAT.parse(endTime);
-		} catch (ParseException e) {
-			throw new WatchdogException(ReturnCode.INVALID_DATE);
-		}
+		Date startDate = getValidDate(startTime);
+		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
@@ -294,6 +289,7 @@ public class Statis {
 					countTotal += apiStatData.getCountTotal();
 					countTimeout += apiStatData.getCountTimeout();
 				} catch (ExecutionException ex) {
+					// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
 					// nothing to do
 				}
 			}
@@ -308,18 +304,14 @@ public class Statis {
 		return result;
 	}
 	
-	public Map<String, Double> getAccuracyTimeSeries(Integer providerId, String startTime, String endTime) {
+	public Map<String, Double> getAccuracyTimeSeries(Integer providerId, String startTime, String endTime) 
+			throws WatchdogException {
 		Map<String, Double> result = Maps.newTreeMap();
 		
 		List<ApiItem> apiItemList = apiItemMapper.listApiItemsByProviderId(providerId);
 		
-		Date startDate = null, endDate = null;
-		try {
-			startDate = CommonUtils.DATE_COMPACT_FORMAT.parse(startTime);
-			endDate = CommonUtils.DATE_COMPACT_FORMAT.parse(endTime);
-		} catch (ParseException e) {
-			throw new WatchdogException(ReturnCode.INVALID_DATE);
-		}
+		Date startDate = getValidDate(startTime);
+		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
@@ -335,6 +327,7 @@ public class Statis {
 					countNot200 += apiStatData.getCountNot200();
 					count200Not0 += apiStatData.getCount200Not0();
 				} catch (ExecutionException ex) {
+					// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
 					// nothing to do
 				}
 			}
@@ -349,18 +342,14 @@ public class Statis {
 		return result;
 	}
 	
-	public Map<String, Double> getAvgResptimeTimeSeries(Integer providerId, String startTime, String endTime) {
+	public Map<String, Double> getAvgResptimeTimeSeries(Integer providerId, String startTime, String endTime) 
+			throws WatchdogException {
 		Map<String, Double> result = Maps.newTreeMap();
 		
 		List<ApiItem> apiItemList = apiItemMapper.listApiItemsByProviderId(providerId);
 		
-		Date startDate = null, endDate = null;
-		try {
-			startDate = CommonUtils.DATE_COMPACT_FORMAT.parse(startTime);
-			endDate = CommonUtils.DATE_COMPACT_FORMAT.parse(endTime);
-		} catch (ParseException e) {
-			throw new WatchdogException(ReturnCode.INVALID_DATE);
-		}
+		Date startDate = getValidDate(startTime);
+		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
@@ -374,6 +363,7 @@ public class Statis {
 					resptimeTotal += apiStatData.getResptimeTotal();
 					callNumWithResp += apiStatData.getCountTotal() - apiStatData.getCountTimeout();	
 				} catch (ExecutionException ex) {
+					// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
 					// nothing
 				}
 			}
@@ -389,7 +379,8 @@ public class Statis {
 	}
 	
 	
-	public Map<String, Integer> getResptimeDistribution(Integer providerId, String startTime, String endTime) {
+	public Map<String, Integer> getResptimeDistribution(Integer providerId, String startTime, String endTime) 
+			throws WatchdogException {
 		Map<String, Integer> result = Maps.newTreeMap();
 		for (String intervalName : StatisUtils.RESP_TIME_DIVISION) {
 			result.put(intervalName, 0);
@@ -397,13 +388,8 @@ public class Statis {
 		
 		List<ApiItem> apiItemList = apiItemMapper.listApiItemsByProviderId(providerId);
 		
-		Date startDate = null, endDate = null;
-		try {
-			startDate = CommonUtils.DATE_COMPACT_FORMAT.parse(startTime);
-			endDate = CommonUtils.DATE_COMPACT_FORMAT.parse(endTime);
-		} catch (ParseException e) {
-			throw new WatchdogException(ReturnCode.INVALID_DATE);
-		}
+		Date startDate = getValidDate(startTime);
+		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
@@ -414,6 +400,7 @@ public class Statis {
 					ApiStatData apiStatData = dataCache.get(redisKeyName);
 					StatisUtils.updateMapCounter(result, StatisUtils.getRespTimeDistribution(apiStatData));
 				} catch (ExecutionException ex) {
+					// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
 					// nothing to do
 				}
 			}	
@@ -429,16 +416,12 @@ public class Statis {
 	 * @param endTime
 	 * @return Map's key is an API id， and its value is the availability of this API.
 	 */
-	public Map<Integer, Double> getApiRankListByAvailablity(Integer providerId, String startTime, String endTime) {
+	public Map<Integer, Double> getApiRankListByAvailablity(Integer providerId, String startTime, String endTime) 
+			throws WatchdogException {
 		Map<Integer, Double> result = Maps.newHashMap();
 		
-		Date startDate = null, endDate = null;
-		try {
-			startDate = CommonUtils.DATE_COMPACT_FORMAT.parse(startTime);
-			endDate = CommonUtils.DATE_COMPACT_FORMAT.parse(endTime);
-		} catch (ParseException e) {
-			throw new WatchdogException(ReturnCode.INVALID_DATE);
-		}
+		Date startDate = getValidDate(startTime);
+		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		
@@ -454,6 +437,7 @@ public class Statis {
 					countTotal += apiStatData.getCountTotal();
 					countTimeout += apiStatData.getCountTimeout();
 				} catch (ExecutionException ex) {
+					// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
 				}
 			}
 
@@ -467,16 +451,12 @@ public class Statis {
 		return result;
 	}
 	
-	public Map<Integer, Double> getApiRankListByAccuracy(Integer providerId, String startTime, String endTime) {
+	public Map<Integer, Double> getApiRankListByAccuracy(Integer providerId, String startTime, String endTime) 
+			throws WatchdogException {
 		Map<Integer, Double> result = Maps.newHashMap();
 		
-		Date startDate = null, endDate = null;
-		try {
-			startDate = CommonUtils.DATE_COMPACT_FORMAT.parse(startTime);
-			endDate = CommonUtils.DATE_COMPACT_FORMAT.parse(endTime);
-		} catch (ParseException e) {
-			throw new WatchdogException(ReturnCode.INVALID_DATE);
-		}
+		Date startDate = getValidDate(startTime);
+		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		
@@ -494,6 +474,7 @@ public class Statis {
 					countNot200 += apiStatData.getCountNot200();
 					count200Not0 += apiStatData.getCount200Not0();
 				} catch (ExecutionException ex) {
+					// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
 				}
 			}
 			
@@ -507,16 +488,12 @@ public class Statis {
 		return result;
 	}
 	
-	public Map<Integer, Double> getApiRankListByAvgResptime(Integer providerId, String startTime, String endTime) {
+	public Map<Integer, Double> getApiRankListByAvgResptime(Integer providerId, String startTime, String endTime) 
+			throws WatchdogException {
 		Map<Integer, Double> result = Maps.newHashMap();
 		
-		Date startDate = null, endDate = null;
-		try {
-			startDate = CommonUtils.DATE_COMPACT_FORMAT.parse(startTime);
-			endDate = CommonUtils.DATE_COMPACT_FORMAT.parse(endTime);
-		} catch (ParseException e) {
-			throw new WatchdogException(ReturnCode.INVALID_DATE);
-		}
+		Date startDate = getValidDate(startTime);
+		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		
@@ -532,6 +509,7 @@ public class Statis {
 					resptimeTotal += apiStatData.getResptimeTotal();
 					callNumWithResp += apiStatData.getCountTotal() - apiStatData.getCountTimeout();
 				} catch (ExecutionException ex) {
+					// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
 				}
 			}
 			
@@ -562,29 +540,28 @@ public class Statis {
 
 		@Override
 		public ApiStatData load(String key) throws ExecutionException {
-			ApiStatData returnData = null;
+			ApiStatData returnData = null;  // the data needed to be got from LoadingCache
 			
 			// preparation work
 			String[] strArray = ((String)key).split("-");
 			int apiId = Integer.valueOf(strArray[0]);
-			Date thisDate = null, preloadEndDate = null;  // start date and end date for preloading
+			Date thisDate = null, endDateForPreload = null;  // start date and end date for preloading
 			try {
 				thisDate = CommonUtils.DATE_COMPACT_FORMAT.parse(strArray[1]);
 			} catch (ParseException ex) {
-				// nothing
+				// never happen
 			}
 			
 			// preload data from redis
-			boolean success = true;  // whether or not succeed to preload all the needed data
 			long timeSliceNum = StatisUtils.CACHE_PRE_LOAD/AnalyzerUtils.TIME_SLICE_LENGTH;
 			for (long i = 0; i < timeSliceNum; i++) {
 				Date currentDate = new Date(thisDate.getTime() + i * AnalyzerUtils.TIME_SLICE_LENGTH);
 				String redisKeyName = String.format("%d-%s", apiId, CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
 
 				Map<Object, Object> redisHash = template.boundHashOps(redisKeyName).entries();
-				if (redisHash == null) {  // the hash doesn't exist in Redis, so preload it from mysql
-					success = false;
-					break;
+				if (redisHash == null || redisHash.isEmpty()) {
+					// the statistical data of the given API for the given date doesn't exist in Redis
+					continue;
 				}
 				
 				ApiStatData apiStatData = new ApiStatData();
@@ -608,16 +585,19 @@ public class Statis {
 					returnData = apiStatData;
 				}
 			}
-			if (success && returnData != null) {
+			if (returnData != null) {
 				return returnData;
 			}
 			
 			// preload data from mysql
-			preloadEndDate = new Date(thisDate.getTime() + StatisUtils.CACHE_PRE_LOAD); // end date for preloading
-			List<ApiStatData> dataList = apiStatDataMapper.getDataByTime(apiId, thisDate, preloadEndDate);
-			if (dataList.size() != 0 && dataList.get(0).getStartTime().getTime() != thisDate.getTime()) {
-				logger.error(String.format("the statistical data [%s] not found", key));
-				return null;
+			endDateForPreload = new Date(thisDate.getTime() + StatisUtils.CACHE_PRE_LOAD); // end date for preloading
+			List<ApiStatData> dataList = apiStatDataMapper.getDataByTime(apiId, thisDate, endDateForPreload);
+			
+			if (dataList.size() == 0 || dataList.get(0).getStartTime().getTime() != thisDate.getTime()) {
+				//logger.debug(String.format("statistical data [%s] not found in both redis and mysql", key));
+				// must not return null
+				throw new ExecutionException(key + " not found in both redis and mysql", 
+						new WatchdogException(ReturnCode.STAT_DATA_NOT_FOUND));
 			}
 			returnData = dataList.get(0);
 			

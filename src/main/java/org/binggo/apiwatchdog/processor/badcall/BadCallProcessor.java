@@ -50,10 +50,14 @@ public class BadCallProcessor extends WatchdogProcessor {
 			return true;
 		}
 		
-		// An API call which has no response
-		if (apiCall.getRequestTime() == null) {
+		// An API call which has no request time and response time
+		if (apiCall.getRequestTime() == null || apiCall.getResponseTime() == null) {
 			return true;
 		}
+		if (apiCall.getResponseTime().getTime() < apiCall.getRequestTime().getTime()) {
+			return true;
+		}
+		
 		// An API call whose response code of HTTP is not 200
 		if (apiCall.getHttpResponseCode() != null && !apiCall.getHttpResponseCode().equals("200")) {
 			return true;
@@ -80,7 +84,7 @@ public class BadCallProcessor extends WatchdogProcessor {
 		apiBadCallMapper.insert((ApiCall) event.getBody()); 
 	}
 	
-	@Scheduled(initialDelay=1000, fixedDelay=3000)
+	@Scheduled(initialDelay=1000, fixedDelay=3*1000)
 	@Override
 	public void runTimerTask() {
 		if (!isInitialized()) {

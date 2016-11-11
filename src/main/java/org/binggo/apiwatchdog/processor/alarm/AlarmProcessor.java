@@ -166,7 +166,7 @@ public class AlarmProcessor extends WatchdogProcessor {
 		return;
 	}		
 	
-	@Scheduled(initialDelay=1000, fixedDelay=3000)
+	@Scheduled(initialDelay=1000, fixedDelay=3*1000)
 	@Override
 	public void runTimerTask() {
 		if (!isInitialized()) {

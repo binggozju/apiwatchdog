@@ -79,7 +79,7 @@ public class KafkaAgent implements TimerRunnable {
 		}
 	}
 	
-	@Scheduled(initialDelay=1000, fixedDelay=5*1000)
+	@Scheduled(initialDelay=1500, fixedDelay=5*1000)
 	@Override
 	public void runTimerTask() {
 		// create the consumer threads
