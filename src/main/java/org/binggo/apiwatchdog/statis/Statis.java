@@ -97,7 +97,7 @@ public class Statis {
 	 * @param endTime
 	 * @return
 	 */
-	public Map<String, Double> getApiAvailablityTimeSeries(Integer apiId, String startTime, String endTime) {
+	public Map<String, Double> getApiAvailabilityTimeSeries(Integer apiId, String startTime, String endTime) {
 		Map<String, Double> result = Maps.newTreeMap();
 		
 		Date startDate = null, endDate = null;
@@ -269,7 +269,7 @@ public class Statis {
 		return result;
 	}
 	
-	public Map<String, Double> getAvailablityTimeSeries(Integer providerId, String startTime, String endTime) {
+	public Map<String, Double> getAvailabilityTimeSeries(Integer providerId, String startTime, String endTime) {
 		Map<String, Double> result = Maps.newTreeMap();
 		
 		List<ApiItem> apiItemList = apiItemMapper.listApiItemsByProviderId(providerId);

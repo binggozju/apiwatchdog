@@ -36,6 +36,7 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/api/getCallNumTS")
 	public WatchdogResponse getApiCallNumTS(@RequestBody Map<String, String> params) {
+		logger.debug("receive a post request to /statis/api/getCallNumTS");
 		try {
 			Integer apiId = Integer.valueOf(params.get("apiId"));
 			String startTime = params.get("startTime");
@@ -54,10 +55,19 @@ public class StatisController {
 	 * @param params
 	 * @return
 	 */
-	@RequestMapping(method=RequestMethod.POST, value="/api/getAvailablityTS")
+	@RequestMapping(method=RequestMethod.POST, value="/api/getAvailabilityTS")
 	public WatchdogResponse getApiAvailablityTS(@RequestBody Map<String, String> params) {
-		// TODO
-		return null;
+		logger.debug("receive a post request to /statis/api/getAvailabilityTS");
+		try {
+			Integer apiId = Integer.valueOf(params.get("apiId"));
+			String startTime = params.get("startTime");
+			String endTime = params.get("endTime");
+			Map<String, Double> statisData = statis.getApiAvailabilityTimeSeries(apiId, startTime, endTime);
+			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
+		} catch (WatchdogException ex) {
+			logger.error(ex.getMessage());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
+		}
 	}
 	
 	/**
@@ -68,8 +78,17 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/api/getAccuracyTS")
 	public WatchdogResponse getApiAccuracyTS(@RequestBody Map<String, String> params) {
-		// TODO
-		return null;
+		logger.debug("receive a post request to /statis/api/getAccuracyTS");
+		try {
+			Integer apiId = Integer.valueOf(params.get("apiId"));
+			String startTime = params.get("startTime");
+			String endTime = params.get("endTime");
+			Map<String, Double> statisData = statis.getApiAccuracyTimeSeries(apiId, startTime, endTime);
+			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
+		} catch (WatchdogException ex) {
+			logger.error(ex.getMessage());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
+		}
 	}
 	
 	/**
@@ -80,8 +99,17 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/api/getAvgResptimeTS")
 	public WatchdogResponse getApiAvgResptimeTS(@RequestBody Map<String, String> params) {
-		// TODO
-		return null;
+		logger.debug("receive a post request to /statis/api/getAvgResptimeTS");
+		try {
+			Integer apiId = Integer.valueOf(params.get("apiId"));
+			String startTime = params.get("startTime");
+			String endTime = params.get("endTime");
+			Map<String, Double> statisData = statis.getApiAvgResptimeTimeSeries(apiId, startTime, endTime);
+			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
+		} catch (WatchdogException ex) {
+			logger.error(ex.getMessage());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
+		}	
 	}
 	
 	/**
@@ -90,10 +118,19 @@ public class StatisController {
 	 * @param params
 	 * @return
 	 */
-	@RequestMapping(method=RequestMethod.POST, value="/api/getResptimeDistTS")
+	@RequestMapping(method=RequestMethod.POST, value="/api/getResptimeDist")
 	public WatchdogResponse getApiResptimeDist(@RequestBody Map<String, String> params) {
-		// TODO
-		return null;
+		logger.debug("receive a post request to /statis/api/getResptimeDist");
+		try {
+			Integer apiId = Integer.valueOf(params.get("apiId"));
+			String startTime = params.get("startTime");
+			String endTime = params.get("endTime");
+			Map<String, Integer> statisData = statis.getApiResptimeDistribution(apiId, startTime, endTime);
+			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
+		} catch (WatchdogException ex) {
+			logger.error(ex.getMessage());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
+		}
 	}
 	
 	
@@ -106,8 +143,17 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/provider/getCallNumTS")
 	public WatchdogResponse getCallNumTS(@RequestBody Map<String, String> params) {
-		// TODO
-		return null;
+		logger.debug("receive a post request to /statis/provider/getCallNumTS");
+		try {
+			Integer providerId = Integer.valueOf(params.get("providerId"));
+			String startTime = params.get("startTime");
+			String endTime = params.get("endTime");
+			Map<String, Integer> statisData = statis.getCallNumTimeSeries(providerId, startTime, endTime);
+			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
+		} catch (WatchdogException ex) {
+			logger.error(ex.getMessage());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
+		}
 	}
 	
 	/**
@@ -118,8 +164,17 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/provider/getAvailabilityTS")
 	public WatchdogResponse getAvailabilityTS(@RequestBody Map<String, String> params) {
-		// TODO
-		return null;
+		logger.debug("receive a post request to /statis/provider/getAvailabilityTS");
+		try {
+			Integer providerId = Integer.valueOf(params.get("providerId"));
+			String startTime = params.get("startTime");
+			String endTime = params.get("endTime");
+			Map<String, Double> statisData = statis.getAvailabilityTimeSeries(providerId, startTime, endTime);
+			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
+		} catch (WatchdogException ex) {
+			logger.error(ex.getMessage());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
+		}
 	}
 	
 	/**
@@ -130,8 +185,17 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/provider/getAccuracyTS")
 	public WatchdogResponse getAccuracyTS(@RequestBody Map<String, String> params) {
-		// TODO
-		return null;
+		logger.debug("receive a post request to /statis/provider/getAccuracyTS");
+		try {
+			Integer providerId = Integer.valueOf(params.get("providerId"));
+			String startTime = params.get("startTime");
+			String endTime = params.get("endTime");
+			Map<String, Double> statisData = statis.getAccuracyTimeSeries(providerId, startTime, endTime);
+			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);	
+		} catch (WatchdogException ex) {
+			logger.error(ex.getMessage());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
+		}	
 	}
 	
 	/**
@@ -142,8 +206,17 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/provider/getAvgResptimeTS")
 	public WatchdogResponse getAvgResptimeTS(@RequestBody Map<String, String> params) {
-		// TODO
-		return null;
+		logger.debug("receive a post request to /statis/provider/getAvgResptimeTS");
+		try {
+			Integer providerId = Integer.valueOf(params.get("providerId"));
+			String startTime = params.get("startTime");
+			String endTime = params.get("endTime");
+			Map<String, Double> statisData = statis.getAvgResptimeTimeSeries(providerId, startTime, endTime);
+			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
+		} catch (WatchdogException ex) {
+			logger.error(ex.getMessage());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
+		}	
 	}
 	
 	/**
@@ -152,10 +225,19 @@ public class StatisController {
 	 * @param params
 	 * @return
 	 */
-	@RequestMapping(method=RequestMethod.POST, value="/provider/getResptimeDistTS")
+	@RequestMapping(method=RequestMethod.POST, value="/provider/getResptimeDist")
 	public WatchdogResponse getResptimeDist(@RequestBody Map<String, String> params) {
-		// TODO
-		return null;
+		logger.debug("receive a post request to /statis/provider/getResptimeDist");
+		try {
+			Integer providerId = Integer.valueOf(params.get("providerId"));
+			String startTime = params.get("startTime");
+			String endTime = params.get("endTime");
+			Map<String, Integer> statisData = statis.getResptimeDistribution(providerId, startTime, endTime);
+			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
+		} catch (WatchdogException ex) {
+			logger.error(ex.getMessage());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
+		}
 	}
 
 	
@@ -168,8 +250,17 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/ranklist/getApiAvailability")
 	public WatchdogResponse getApiRankListByAvailablity(@RequestBody Map<String, String> params) {
-		// TODO
-		return null;
+		logger.debug("receive a post request to /statis/ranklist/getApiAvailability");
+		try {
+			Integer providerId = Integer.valueOf(params.get("providerId"));
+			String startTime = params.get("startTime");
+			String endTime = params.get("endTime");
+			Map<Integer, Double> rankListData = statis.getApiRankListByAvailablity(providerId, startTime, endTime);
+			return WatchdogResponse.getResponse(ReturnCode.OK, rankListData);	
+		} catch (WatchdogException ex) {
+			logger.error(ex.getMessage());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
+		}	
 	}
 
 	/**
@@ -180,8 +271,17 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/ranklist/getApiAccuracy")
 	public WatchdogResponse getApiRankListByAccuracy(@RequestBody Map<String, String> params) {
-		// TODO
-		return null;
+		logger.debug("receive a post request to /statis/ranklist/getApiAccuracy");
+		try {
+			Integer providerId = Integer.valueOf(params.get("providerId"));
+			String startTime = params.get("startTime");
+			String endTime = params.get("endTime");
+			Map<Integer, Double> rankListData = statis.getApiRankListByAccuracy(providerId, startTime, endTime);
+			return WatchdogResponse.getResponse(ReturnCode.OK, rankListData);	
+		} catch (WatchdogException ex) {
+			logger.error(ex.getMessage());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
+		}	
 	}
 	
 	/**
@@ -192,8 +292,17 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/ranklist/getApiAvgResptime")
 	public WatchdogResponse getApiRankListByAvgResptime(@RequestBody Map<String, String> params) {
-		// TODO
-		return null;
+		logger.debug("receive a post request to /statis/ranklist/getApiAvgResptime");
+		try {
+			Integer providerId = Integer.valueOf(params.get("providerId"));
+			String startTime = params.get("startTime");
+			String endTime = params.get("endTime");
+			Map<Integer, Double> rankListData = statis.getApiRankListByAvgResptime(providerId, startTime, endTime);
+			return WatchdogResponse.getResponse(ReturnCode.OK, rankListData);
+		} catch (WatchdogException ex) {
+			logger.error(ex.getMessage());
+			return WatchdogResponse.getResponse(ex.getReturnCode());
+		}	
 	}
 	
 }
