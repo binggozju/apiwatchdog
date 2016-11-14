@@ -172,10 +172,11 @@ public class KafkaAgent implements TimerRunnable {
 					ConsumerRecords<String, String> records = consumer.poll(500);
 					for (ConsumerRecord<String, String> record : records) {
 						try {
+							logger.debug(String.format("kafka msg: %s", record.value()));
 							ApiCall apiCall = gson.fromJson(record.value(), ApiCall.class);
 							collector.collect(Event.buildEvent(apiCall));
 						} catch (JsonSyntaxException ex) {
-							logger.error(String.format("api call of json format invalid: %s", ex.getMessage()));
+							logger.error(String.format("invalid kafka msg: %s", ex.getMessage()));
 							continue;
 						}	
 					}
