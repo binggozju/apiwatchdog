@@ -2,7 +2,7 @@
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
 
 	<property name="APP" value="apiwatchdog"/>
-	<property name="LOG_HOME" value="logs/"/>
+	<property name="LOG_HOME" value="/data0/apiwatchdog/"/>
 	
 	<!-- console appender -->
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">

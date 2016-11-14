@@ -119,7 +119,7 @@ public class ConfigProvider implements TimerRunnable {
 		// check the response time
 		int timeDelta = (int)(apiCall.getResponseTime().getTime() - apiCall.getRequestTime().getTime())/1000;
 		if (timeDelta >= apiConfMap.get(apiId).getMetricResptimeThreshold()) {
-			if (apiConfMap.get(apiId).getMetricResptimeThreshold() != 0) {
+			if (apiConfMap.get(apiId).getMetricResptimeThreshold() > 0) {
 				event.addHeader(AlarmTemplate.ALARM_REASON_KEY, AlarmTemplate.ALARM_REASON_EXCEED_THRESHOLD);
 				confRWLock.readLock().unlock();
 				return true;
