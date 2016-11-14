@@ -66,7 +66,10 @@ public class KafkaAgent implements TimerRunnable {
 		consumerThreadMap = Maps.newHashMap();
 		
 		this.collector = collector;
-		this.gson = new GsonBuilder().disableHtmlEscaping().create();
+		this.gson = new GsonBuilder()
+				.setDateFormat("yyyy-MM-dd HH:mm:ss")  // must set it in linux environment
+				.disableHtmlEscaping()
+				.create();
 	}
 	
 	private void initialize() {
