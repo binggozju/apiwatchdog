@@ -68,6 +68,10 @@ public class ConfigProvider implements TimerRunnable {
 		
 		confRWLock.readLock().lock();
 		Integer providerId = apiConfMap.get(apiId).getProviderId();
+		if (providerConfMap.get(providerId) == null) {  // avoid null point exception
+			confRWLock.readLock().unlock();
+			return false;
+		}
 		
 		// add helpful information to the headers
 		String alarmType = apiConfMap.get(apiId).getAlarmType().toString();

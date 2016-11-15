@@ -59,11 +59,16 @@ public class BadCallProcessor extends WatchdogProcessor {
 		}
 		
 		// An API call whose response code of HTTP is not 200
-		if (apiCall.getHttpResponseCode() != null && !apiCall.getHttpResponseCode().equals("200")) {
+		if (apiCall.getHttpResponseCode() == null) {
+			return true;
+		} else if (!apiCall.getHttpResponseCode().equals("200")) {
 			return true;
 		}
+		
 		// An API call whose return code of API is not 0
-		if (apiCall.getApiReturnCode() != null && !apiCall.getApiReturnCode().equals("0")) {
+		if (apiCall.getApiReturnCode() == null) {
+			return true;
+		} else if (!apiCall.getApiReturnCode().equals("0")) {
 			return true;
 		}
 		
