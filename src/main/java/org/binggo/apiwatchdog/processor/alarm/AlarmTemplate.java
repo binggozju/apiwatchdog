@@ -24,29 +24,39 @@ public class AlarmTemplate {
 		Integer apiId = apiCall.getApiId();
 		String requestTime = CommonUtils.DATE_NORMAL_FORMAT.format(apiCall.getRequestTime());
 		String source = apiCall.getSourceService();
-		String apiCallUuid = apiCall.getCallUuid();
+		//String apiCallUuid = apiCall.getCallUuid();
 		
 		switch (event.getHeaders().get(ALARM_REASON_KEY)) {
 		case ALARM_REASON_NO_RESPONSE:
-			return String.format("[HTTP响应丢失告警] API（id为%d）在%s时间收到来自%s的一次调用（调用id为%s）未收到响应包", 
-					apiId, requestTime, source, apiCallUuid);
+			return String.format("[HTTP响应丢失告警] API（id:%d）于%s收到%s发起的调用响应丢失", 
+					apiId, requestTime, source);
+			/*return String.format("[HTTP响应丢失告警] API（id:%d）于%s收到%s发起的调用（调用id:%s）未收到响应包", 
+					apiId, requestTime, source, apiCallUuid); */
 			
 		case ALARM_REASON_EXCEED_THRESHOLD:
 			int timeDelta = (int)(apiCall.getResponseTime().getTime() - apiCall.getRequestTime().getTime())/1000;
-			return String.format("[响应时间超时告警] API（id为%d）在%s时间收到来自%s的一次调用（调用id为%s）响应时间超时，响应时间为%d秒", 
-					apiId, requestTime, source, apiCallUuid, timeDelta);
+			return String.format("[响应超时告警] API（id:%d）于%s收到%s发起的调用响应时间%d秒", 
+					apiId, requestTime, source, timeDelta);
+			/*return String.format("[响应超时告警] API（id:%d）于%s收到%s发起的调用（调用id:%s）响应时间%d秒", 
+					apiId, requestTime, source, apiCallUuid, timeDelta); */
 			
 		case ALARM_REASON_NOT_HTTP200:
-			return String.format("[HTTP响应码非200告警] API（id为%d）在%s时间收到来自%s的一次调用（调用id为%s）的HTTP响应码为%s",
-					apiId, requestTime, source, apiCallUuid, apiCall.getHttpResponseCode());
+			return String.format("[HTTP响应码非200告警] API（id:%d）于%s收到%s发起的调用HTTP响应码为%s",
+					apiId, requestTime, source, apiCall.getHttpResponseCode());
+			/*return String.format("[HTTP响应码非200告警] API（id:%d）于%s收到%s发起的调用（调用id:%s）HTTP响应码为%s",
+					apiId, requestTime, source, apiCallUuid, apiCall.getHttpResponseCode()); */
 			
 		case ALARM_REASON_NOT_RETCODE0:
-			return String.format("[返回码非0告警] API（id为%d）在%s时间收到来自%s的一次调用（调用id为%s）的调用返回码为%s",
-					apiId, requestTime, source, apiCallUuid, apiCall.getApiReturnCode());
+			return String.format("[返回码非0告警] API（id:%d）于%s收到%s发起的调用返回码为%s",
+					apiId, requestTime, source, apiCall.getApiReturnCode());
+			/*return String.format("[返回码非0告警] API（id:%d）于%s收到%s发起的调用（调用id:%s）返回码为%s",
+					apiId, requestTime, source, apiCallUuid, apiCall.getApiReturnCode()); */
 			
 		default:
-			return String.format("[API调用错误告警] API（id为%d）在%s时间收到来自%s的一次调用（调用id为%s）发生错误", 
-					apiId, requestTime, source, apiCallUuid);
+			return String.format("[API调用错误告警] API（id:%d）于%s收到%s发起的调用发生错误", 
+					apiId, requestTime, source);
+			/*return String.format("[API调用错误告警] API（id:%d）于%s收到%s发起的调用（调用id:%s）发生错误", 
+					apiId, requestTime, source, apiCallUuid); */
 		}
 	}
 
