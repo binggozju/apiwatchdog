@@ -8,3 +8,5 @@ config/production.properties
 
 target/*
 logs/*
+
+scripts/tmp.sh
