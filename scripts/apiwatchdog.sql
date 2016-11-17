@@ -21,7 +21,7 @@ CREATE TABLE `api_bad_call` (
   `response_body` varchar(1024) DEFAULT '' COMMENT 'reponse响应内容',
   PRIMARY KEY (`id`),
   KEY `request_time` (`request_time`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for api_item
@@ -46,7 +46,7 @@ CREATE TABLE `api_item` (
   `created_time` datetime NOT NULL,
   `last_updated_time` datetime NOT NULL,
   PRIMARY KEY (`api_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for api_provider
@@ -64,7 +64,7 @@ CREATE TABLE `api_provider` (
   `created_time` datetime NOT NULL,
   `last_updated_time` datetime NOT NULL,
   PRIMARY KEY (`provider_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for api_stat_data
@@ -95,4 +95,4 @@ CREATE TABLE `api_stat_data` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `apiid_starttime` (`api_id`,`start_time`) USING BTREE,
   KEY `start_time` (`start_time`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

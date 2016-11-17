@@ -3,7 +3,8 @@
 # Usage: used to test each http api of apiwatchdog
 # --------------------------------------------------------
 
-HOST=http://localhost:8081
+HOST=http://localhost:9026
+#HOST=http://monitor.yqphh.com/api
 
 # -------------- config ------------------
 # provider config

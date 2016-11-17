@@ -15,9 +15,11 @@ public final class CommonUtils {
 	
 	public static final DateFormat DATE_COMPACT_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
 	public static final DateFormat DATE_NORMAL_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	
 	private static Pattern linePattern = Pattern.compile("_(\\w)");
+	
 	// transform a string from line format to hump format
 	public static String lineToHump(String str){  
         str = str.toLowerCase();  
