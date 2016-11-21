@@ -38,7 +38,7 @@ public class AlarmProcessor extends WatchdogProcessor {
 	private Integer smsAlarmQuota;
 	// alarm type -> (api id -> the number of alarm messages)
 	private Map<String, Map<Integer, AtomicInteger> > alarmCounter;
-	private ThreadPoolTaskScheduler taskScheduler;  // used to clear the alarm counter every two hours
+	private ThreadPoolTaskScheduler taskScheduler;  // used to reset the alarm counter every two hours
 	
 	private ConfigProvider configProvider;
 	
