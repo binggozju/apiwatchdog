@@ -1,6 +1,7 @@
 package org.binggo.apiwatchdog.dump;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
@@ -109,6 +110,7 @@ public class DataDumper implements TimerRunnable {
 	 * dump the statistical information between the nextDumpTimeSlice and now from Redis to MySQL
 	 */
 	private void dump() {
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date nowTime = new Date();
 		long endTimeSliceIndex = nowTime.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long startTimeSliceIndex;
@@ -117,7 +119,7 @@ public class DataDumper implements TimerRunnable {
 		String nextDumpTimeSlice = (String) template.opsForValue().get(DataDumperUtils.KEY_NEXT_DUMP_TIME_SLICE);
 		if (nextDumpTimeSlice != null) {
 			try {
-				Date nextDumpDate = CommonUtils.DATE_COMPACT_FORMAT.parse(nextDumpTimeSlice);
+				Date nextDumpDate = compactFormat.parse(nextDumpTimeSlice);
 				startTimeSliceIndex = nextDumpDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 			} catch (ParseException ex) {
 				logger.error(String.format("The last dump time is invalid, quit to dump", nextDumpTimeSlice));
@@ -129,12 +131,12 @@ public class DataDumper implements TimerRunnable {
 		
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
 			Date sliceDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
-			dump(CommonUtils.DATE_COMPACT_FORMAT.format(sliceDate));
+			dump(compactFormat.format(sliceDate));
 		}
 		
 		// update the last dump time slice in redis
 		Date dumpTime = new Date(endTimeSliceIndex * AnalyzerUtils.TIME_SLICE_LENGTH);
-		template.boundValueOps(DataDumperUtils.KEY_NEXT_DUMP_TIME_SLICE).set(CommonUtils.DATE_COMPACT_FORMAT.format(dumpTime));
+		template.boundValueOps(DataDumperUtils.KEY_NEXT_DUMP_TIME_SLICE).set(compactFormat.format(dumpTime));
 	}
 	
 	/**
@@ -142,6 +144,7 @@ public class DataDumper implements TimerRunnable {
 	 * @param timeSlice format: yyyyMMddHHmm00
 	 */
 	public void dump(String timeSlice) {
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		String sliceKeysPattern = String.format("*-%s", timeSlice.trim());
 		Set<String> sliceKeys = template.keys(sliceKeysPattern);
 		
@@ -153,7 +156,7 @@ public class DataDumper implements TimerRunnable {
 			Integer apiId = Integer.valueOf(strArray[0]);
 			apiStatData.setApiId(apiId);
 			try {
-				Date sliceStartTime = CommonUtils.DATE_COMPACT_FORMAT.parse(strArray[1]);
+				Date sliceStartTime = compactFormat.parse(strArray[1]);
 				apiStatData.setStartTime(sliceStartTime);
 			} catch (ParseException e) {
 				logger.error(String.format("Redis key [%s] is invalid", sliceKey));

@@ -1,6 +1,7 @@
 package org.binggo.apiwatchdog.statis;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.binggo.apiwatchdog.domain.ApiStatData;
 @Component
 public class Statis {
 	
+	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(Statis.class);
 	
 	// data cache for statistical data in Redis
@@ -60,7 +62,9 @@ public class Statis {
 			throw new WatchdogException(ReturnCode.INVALID_DATE);
 		}
 		try {
-			Date resultDate = CommonUtils.DATE_COMPACT_FORMAT.parse(dateStr);
+			DateFormat dateFormat = CommonUtils.getCompactDateFormat();
+			Date resultDate = dateFormat.parse(dateStr);
+			
 			Date nowDate = new Date();
 			if (resultDate.getTime() > nowDate.getTime()) {
 				resultDate = nowDate;
@@ -84,20 +88,21 @@ public class Statis {
 			throws WatchdogException {
 		Map<String, Integer> result = Maps.newTreeMap();
 		
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date startDate = getValidDate(startTime);
 		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
 			Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
-			String redisKeyName = String.format("%d-%s", apiId, CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+			String redisKeyName = String.format("%d-%s", apiId, compactFormat.format(currentDate));
 			
 			try {
 				ApiStatData apiStatData = dataCache.get(redisKeyName);
-				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), apiStatData.getCountTotal());
+				result.put(compactFormat.format(currentDate), apiStatData.getCountTotal());
 			} catch (ExecutionException ex) {
 				// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
-				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 0);
+				result.put(compactFormat.format(currentDate), 0);
 			}
 		}
 		return result;
@@ -114,25 +119,26 @@ public class Statis {
 			throws WatchdogException {
 		Map<String, Double> result = Maps.newTreeMap();
 		
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date startDate = getValidDate(startTime);
 		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
 			Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
-			String redisKeyName = String.format("%d-%s", apiId, CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+			String redisKeyName = String.format("%d-%s", apiId, compactFormat.format(currentDate));
 			
 			try {
 				ApiStatData apiStatData = dataCache.get(redisKeyName);
 				if (apiStatData.getCountTotal() == 0) {
-					result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 1.00);
+					result.put(compactFormat.format(currentDate), 1.00);
 					continue;
 				}
 				double availablity = (apiStatData.getCountTotal() - apiStatData.getCountTimeout()) * 1.00 / apiStatData.getCountTotal();
-				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), availablity);
+				result.put(compactFormat.format(currentDate), availablity);
 			} catch (ExecutionException ex) {
 				// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
-				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 1.00);
+				result.put(compactFormat.format(currentDate), 1.00);
 			}
 		}
 		return result;
@@ -149,26 +155,27 @@ public class Statis {
 			throws WatchdogException {
 		Map<String, Double> result = Maps.newTreeMap();
 		
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date startDate = getValidDate(startTime);
 		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
 			Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
-			String redisKeyName = String.format("%d-%s", apiId, CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+			String redisKeyName = String.format("%d-%s", apiId, compactFormat.format(currentDate));
 			
 			try {
 				ApiStatData apiStatData = dataCache.get(redisKeyName);
 				if (apiStatData.getCountTotal() == 0) {
-					result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 1.00);
+					result.put(compactFormat.format(currentDate), 1.00);
 					continue;
 				}
 				double accuracy = (apiStatData.getCountTotal() - apiStatData.getCountTimeout() - apiStatData.getCountNot200() 
 						- apiStatData.getCount200Not0()) * 1.00 / apiStatData.getCountTotal();
-				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), accuracy);
+				result.put(compactFormat.format(currentDate), accuracy);
 			} catch (ExecutionException ex) {
 				// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
-				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 1.00);
+				result.put(compactFormat.format(currentDate), 1.00);
 			}
 		}
 		return result;
@@ -178,26 +185,27 @@ public class Statis {
 			throws WatchdogException {
 		Map<String, Double> result = Maps.newTreeMap();
 		
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date startDate = getValidDate(startTime);
 		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
 			Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
-			String redisKeyName = String.format("%d-%s", apiId, CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+			String redisKeyName = String.format("%d-%s", apiId, compactFormat.format(currentDate));
 			try {
 				ApiStatData apiStatData = dataCache.get(redisKeyName);
 				int resptimeTotal = apiStatData.getResptimeTotal();
 				int callNumWithResp = apiStatData.getCountTotal() - apiStatData.getCountTimeout();
 				if (callNumWithResp == 0) {
-					result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 0.00);
+					result.put(compactFormat.format(currentDate), 0.00);
 					continue;
 				}
 				double avgResptime = resptimeTotal * 1.00 / callNumWithResp;
-				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), avgResptime);
+				result.put(compactFormat.format(currentDate), avgResptime);
 			} catch (ExecutionException ex) {
 				// the meaning of exception above: the statistical data doesn't exist in both Redis and MySQL.
-				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 0.00);
+				result.put(compactFormat.format(currentDate), 0.00);
 			}
 		}
 		return result;
@@ -217,13 +225,14 @@ public class Statis {
 			result.put(intervalName, 0);
 		}
 		
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date startDate = getValidDate(startTime);
 		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
 			Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
-			String redisKeyName = String.format("%d-%s", apiId, CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+			String redisKeyName = String.format("%d-%s", apiId, compactFormat.format(currentDate));
 			
 			try {
 				ApiStatData apiStatData = dataCache.get(redisKeyName);
@@ -244,6 +253,7 @@ public class Statis {
 		
 		List<ApiItem> apiItemList = apiItemMapper.listApiItemsByProviderId(providerId);
 		
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date startDate = getValidDate(startTime);
 		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
@@ -253,7 +263,7 @@ public class Statis {
 			
 			Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
 			for (ApiItem api : apiItemList) {
-				String redisKeyName = String.format("%d-%s", api.getApiId(), CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+				String redisKeyName = String.format("%d-%s", api.getApiId(), compactFormat.format(currentDate));
 				try {
 					ApiStatData apiStatData = dataCache.get(redisKeyName);
 					callNum += apiStatData.getCountTotal();
@@ -263,7 +273,7 @@ public class Statis {
 				}	
 			} // end of loop for apiItemList
 			
-			result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), callNum);
+			result.put(compactFormat.format(currentDate), callNum);
 		}
 		return result;
 	}
@@ -274,6 +284,7 @@ public class Statis {
 		
 		List<ApiItem> apiItemList = apiItemMapper.listApiItemsByProviderId(providerId);
 		
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date startDate = getValidDate(startTime);
 		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
@@ -283,7 +294,7 @@ public class Statis {
 			
 			Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
 			for (ApiItem api : apiItemList) {
-				String redisKeyName = String.format("%d-%s", api.getApiId(), CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+				String redisKeyName = String.format("%d-%s", api.getApiId(), compactFormat.format(currentDate));
 				try {
 					ApiStatData apiStatData = dataCache.get(redisKeyName);
 					countTotal += apiStatData.getCountTotal();
@@ -295,11 +306,11 @@ public class Statis {
 			}
 			
 			if (countTotal == 0) {
-				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 1.00);
+				result.put(compactFormat.format(currentDate), 1.00);
 				continue;
 			}
 			double availablity = (countTotal - countTimeout) * 1.00 / countTotal;
-			result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), availablity);
+			result.put(compactFormat.format(currentDate), availablity);
 		}	
 		return result;
 	}
@@ -310,6 +321,7 @@ public class Statis {
 		
 		List<ApiItem> apiItemList = apiItemMapper.listApiItemsByProviderId(providerId);
 		
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date startDate = getValidDate(startTime);
 		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
@@ -319,7 +331,7 @@ public class Statis {
 			
 			Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
 			for (ApiItem api : apiItemList) {
-				String redisKeyName = String.format("%d-%s", api.getApiId(), CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+				String redisKeyName = String.format("%d-%s", api.getApiId(), compactFormat.format(currentDate));
 				try {
 					ApiStatData apiStatData = dataCache.get(redisKeyName);
 					countTotal += apiStatData.getCountTotal();
@@ -333,11 +345,11 @@ public class Statis {
 			}
 			
 			if (countTotal == 0) {
-				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 1.00);
+				result.put(compactFormat.format(currentDate), 1.00);
 				continue;
 			}
 			double accuracy = (countTotal - countTimeout - countNot200 - count200Not0) * 1.00 / countTotal;
-			result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), accuracy);
+			result.put(compactFormat.format(currentDate), accuracy);
 		}	
 		return result;
 	}
@@ -348,6 +360,7 @@ public class Statis {
 		
 		List<ApiItem> apiItemList = apiItemMapper.listApiItemsByProviderId(providerId);
 		
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date startDate = getValidDate(startTime);
 		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
@@ -357,7 +370,7 @@ public class Statis {
 			
 			Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
 			for (ApiItem api : apiItemList) {
-				String redisKeyName = String.format("%d-%s", api.getApiId(), CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+				String redisKeyName = String.format("%d-%s", api.getApiId(), compactFormat.format(currentDate));
 				try {
 					ApiStatData apiStatData = dataCache.get(redisKeyName);
 					resptimeTotal += apiStatData.getResptimeTotal();
@@ -369,11 +382,11 @@ public class Statis {
 			}
 
 			if (callNumWithResp == 0) {
-				result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), 0.00);
+				result.put(compactFormat.format(currentDate), 0.00);
 				continue;
 			}
 			double avgResptime = resptimeTotal * 1.00 / callNumWithResp;
-			result.put(CommonUtils.DATE_COMPACT_FORMAT.format(currentDate), avgResptime);
+			result.put(compactFormat.format(currentDate), avgResptime);
 		}
 		return result;
 	}
@@ -388,6 +401,8 @@ public class Statis {
 		
 		List<ApiItem> apiItemList = apiItemMapper.listApiItemsByProviderId(providerId);
 		
+		
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date startDate = getValidDate(startTime);
 		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
@@ -395,7 +410,7 @@ public class Statis {
 		for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
 			Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
 			for (ApiItem api : apiItemList) {
-				String redisKeyName = String.format("%d-%s", api.getApiId(), CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+				String redisKeyName = String.format("%d-%s", api.getApiId(), compactFormat.format(currentDate));
 				try {
 					ApiStatData apiStatData = dataCache.get(redisKeyName);
 					StatisUtils.updateMapCounter(result, StatisUtils.getRespTimeDistribution(apiStatData));
@@ -420,6 +435,7 @@ public class Statis {
 			throws WatchdogException {
 		Map<Integer, Double> result = Maps.newHashMap();
 		
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date startDate = getValidDate(startTime);
 		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
@@ -431,7 +447,7 @@ public class Statis {
 			
 			for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
 				Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
-				String redisKeyName = String.format("%d-%s", api.getApiId(), CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+				String redisKeyName = String.format("%d-%s", api.getApiId(), compactFormat.format(currentDate));
 				try {
 					ApiStatData apiStatData = dataCache.get(redisKeyName);
 					countTotal += apiStatData.getCountTotal();
@@ -455,6 +471,7 @@ public class Statis {
 			throws WatchdogException {
 		Map<Integer, Double> result = Maps.newHashMap();
 		
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date startDate = getValidDate(startTime);
 		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
@@ -466,7 +483,7 @@ public class Statis {
 			
 			for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
 				Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
-				String redisKeyName = String.format("%d-%s", api.getApiId(), CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+				String redisKeyName = String.format("%d-%s", api.getApiId(), compactFormat.format(currentDate));
 				try {
 					ApiStatData apiStatData = dataCache.get(redisKeyName);
 					countTotal += apiStatData.getCountTotal();
@@ -492,6 +509,7 @@ public class Statis {
 			throws WatchdogException {
 		Map<Integer, Double> result = Maps.newHashMap();
 		
+		DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 		Date startDate = getValidDate(startTime);
 		Date endDate = getValidDate(endTime);
 		long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
@@ -503,7 +521,7 @@ public class Statis {
 			
 			for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
 				Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
-				String redisKeyName = String.format("%d-%s", api.getApiId(), CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+				String redisKeyName = String.format("%d-%s", api.getApiId(), compactFormat.format(currentDate));
 				try {
 					ApiStatData apiStatData = dataCache.get(redisKeyName);
 					resptimeTotal += apiStatData.getResptimeTotal();
@@ -546,8 +564,9 @@ public class Statis {
 			String[] strArray = ((String)key).split("-");
 			int apiId = Integer.valueOf(strArray[0]);
 			Date thisDate = null, endDateForPreload = null;  // start date and end date for preloading
+			DateFormat compactFormat = CommonUtils.getCompactDateFormat();
 			try {
-				thisDate = CommonUtils.DATE_COMPACT_FORMAT.parse(strArray[1]);
+				thisDate = compactFormat.parse(strArray[1]);
 			} catch (ParseException ex) {
 				// never happen
 			}
@@ -556,7 +575,7 @@ public class Statis {
 			long timeSliceNum = StatisUtils.CACHE_PRE_LOAD/AnalyzerUtils.TIME_SLICE_LENGTH;
 			for (long i = 0; i < timeSliceNum; i++) {
 				Date currentDate = new Date(thisDate.getTime() + i * AnalyzerUtils.TIME_SLICE_LENGTH);
-				String redisKeyName = String.format("%d-%s", apiId, CommonUtils.DATE_COMPACT_FORMAT.format(currentDate));
+				String redisKeyName = String.format("%d-%s", apiId, compactFormat.format(currentDate));
 
 				Map<Object, Object> redisHash = template.boundHashOps(redisKeyName).entries();
 				if (redisHash == null || redisHash.isEmpty()) {
@@ -604,7 +623,7 @@ public class Statis {
 			for (ApiStatData data : dataList) {
 				String dataRedisKey = String.format("%d-%s", 
 						data.getApiId(), 
-						CommonUtils.DATE_COMPACT_FORMAT.format(data.getStartTime())
+						compactFormat.format(data.getStartTime())
 					);
 				dataCache.put(dataRedisKey, data);
 			}

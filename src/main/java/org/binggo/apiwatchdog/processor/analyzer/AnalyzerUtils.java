@@ -62,7 +62,7 @@ public class AnalyzerUtils {
 		Long longStartOfSlice = (date.getTime()/TIME_SLICE_LENGTH) * TIME_SLICE_LENGTH;
 		Date dateStartOfSlice = new Date(longStartOfSlice);
 		
-		return CommonUtils.DATE_COMPACT_FORMAT.format(dateStartOfSlice);
+		return CommonUtils.getCompactDateFormat().format(dateStartOfSlice);
 	}
 	
 	/**

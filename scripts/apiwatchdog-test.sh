@@ -24,7 +24,7 @@ HOST=http://localhost:9026
 # curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"name\":\"mockapp_api1\", \"path\":\"/path/to/api1\", \"type\":\"post\", \"providerId\":1, \"state\":1, \"metricNot200\":1, \"metric200Not0\":0, \"metricResptimeThreshold\":4, \"alarmType\":3}" $HOST/config/api/add 2> /dev/null
 # curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"name\":\"mockapp_api2\", \"path\":\"/path/to/api2\", \"type\":\"get\", \"providerId\":1, \"state\":1, \"metricNot200\":1, \"metric200Not0\":0, \"metricResptimeThreshold\":5, \"alarmType\":1}" $HOST/config/api/add 2> /dev/null
 # curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"name\":\"mockapp_api3\", \"path\":\"/path/to/api3\", \"type\":\"post\", \"providerId\":1, \"state\":1, \"metricNot200\":1, \"metric200Not0\":0, \"metricResptimeThreshold\":1, \"alarmType\":1}" $HOST/config/api/add 2> /dev/null
-curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"name\":\"sendSyncMail\", \"path\":\"/mail/sync\", \"type\":\"post\", \"providerId\":2, \"state\":1, \"metricNot200\":1, \"metric200Not0\":0, \"metricResptimeThreshold\":5, \"alarmType\":1, \"weixinReceivers\":\"ybzhan;jjweng\"}" $HOST/config/api/add 2> /dev/null
+# curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"name\":\"sendSyncMail\", \"path\":\"/mail/sync\", \"type\":\"post\", \"providerId\":2, \"state\":1, \"metricNot200\":1, \"metric200Not0\":0, \"metricResptimeThreshold\":5, \"alarmType\":1, \"weixinReceivers\":\"ybzhan;jjweng\"}" $HOST/config/api/add 2> /dev/null
 
 # curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"apiId\":1, \"name\":\"api1\"}" $HOST/config/api/update 2> /dev/null
 
@@ -48,7 +48,7 @@ curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -
 
 
 # -------------- statis ------------------
-# curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"apiId\":2, \"startTime\":\"20161111111500\", \"endTime\":\"20161111115000\"}" $HOST/statis/api/getCallNumTS 2> /dev/null
+curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"apiId\":"2", \"startTime\":\"20161111111500\", \"endTime\":\"20161111115000\"}" $HOST/statis/api/getCallNumTS 2> /dev/null
 
 # curl -X POST -H "Accept: application/json" -H "Content-type: application/json" -d "{\"apiId\":2, \"startTime\":\"20161111111500\", \"endTime\":\"20161111115000\"}" $HOST/statis/api/getAvailabilityTS 2> /dev/null
 

@@ -22,7 +22,7 @@ public class AlarmTemplate {
 		ApiCall apiCall = (ApiCall) event.getBody();
 		
 		Integer apiId = apiCall.getApiId();
-		String requestTime = CommonUtils.DATE_NORMAL_FORMAT.format(apiCall.getRequestTime());
+		String requestTime = CommonUtils.getNormalDateFormat().format(apiCall.getRequestTime());
 		String source = apiCall.getSourceService();
 		//String apiCallUuid = apiCall.getCallUuid();
 		

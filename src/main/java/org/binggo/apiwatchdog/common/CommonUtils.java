@@ -12,10 +12,22 @@ public final class CommonUtils {
 	
 	public static final List<Object> EMPTY_LIST = Lists.newArrayList();
 	
+	//public static final DateFormat DATE_COMPACT_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
+	//public static final DateFormat DATE_NORMAL_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	//public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	public static final DateFormat DATE_COMPACT_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
-	public static final DateFormat DATE_NORMAL_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static final DateFormat getCompactDateFormat() {
+		return new SimpleDateFormat("yyyyMMddHHmmss");
+	}
+	
+	public static final DateFormat getNormalDateFormat() {
+		return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	} 
+	
+	public static final DateFormat getDateFormat() {
+		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	}
+	
 	
 	
 	private static Pattern linePattern = Pattern.compile("_(\\w)");
