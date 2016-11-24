@@ -13,7 +13,7 @@ public class StatisUtils {
 	
 	// If the given key doesn't exist in LoadingCache, 
 	// preload the statistical data from now to CACHE_PRE_LOAD hours later.
-	public static final long CACHE_PRE_LOAD = 4*60*60*1000;  // milliseconds
+	public static final long CACHE_PRE_LOAD = 3*60*60*1000;  // milliseconds
 	
 	
 	// division of response time

@@ -1,5 +1,6 @@
 package org.binggo.apiwatchdog.controller;
 
+import java.util.Date;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.binggo.apiwatchdog.common.CommonUtils;
 import org.binggo.apiwatchdog.common.ReturnCode;
 import org.binggo.apiwatchdog.common.WatchdogException;
 import org.binggo.apiwatchdog.common.WatchdogResponse;
@@ -42,6 +44,7 @@ public class StatisController {
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Integer> statisData = statis.getApiCallNumTimeSeries(apiId, startTime, endTime);
+			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -63,6 +66,7 @@ public class StatisController {
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Double> statisData = statis.getApiAvailabilityTimeSeries(apiId, startTime, endTime);
+			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -84,6 +88,7 @@ public class StatisController {
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Double> statisData = statis.getApiAccuracyTimeSeries(apiId, startTime, endTime);
+			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -105,6 +110,7 @@ public class StatisController {
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Double> statisData = statis.getApiAvgResptimeTimeSeries(apiId, startTime, endTime);
+			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -126,6 +132,7 @@ public class StatisController {
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Integer> statisData = statis.getApiResptimeDistribution(apiId, startTime, endTime);
+			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -149,6 +156,7 @@ public class StatisController {
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Integer> statisData = statis.getCallNumTimeSeries(providerId, startTime, endTime);
+			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -170,6 +178,7 @@ public class StatisController {
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Double> statisData = statis.getAvailabilityTimeSeries(providerId, startTime, endTime);
+			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -191,6 +200,7 @@ public class StatisController {
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Double> statisData = statis.getAccuracyTimeSeries(providerId, startTime, endTime);
+			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);	
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -212,6 +222,7 @@ public class StatisController {
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Double> statisData = statis.getAvgResptimeTimeSeries(providerId, startTime, endTime);
+			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -233,6 +244,7 @@ public class StatisController {
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Integer> statisData = statis.getResptimeDistribution(providerId, startTime, endTime);
+			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -256,6 +268,7 @@ public class StatisController {
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<Integer, Double> rankListData = statis.getApiRankListByAvailablity(providerId, startTime, endTime);
+			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, rankListData);	
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -277,6 +290,7 @@ public class StatisController {
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<Integer, Double> rankListData = statis.getApiRankListByAccuracy(providerId, startTime, endTime);
+			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, rankListData);	
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -298,6 +312,7 @@ public class StatisController {
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<Integer, Double> rankListData = statis.getApiRankListByAvgResptime(providerId, startTime, endTime);
+			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, rankListData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());

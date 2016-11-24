@@ -21,11 +21,13 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import org.apache.commons.beanutils.BeanUtils;
+
 import org.binggo.apiwatchdog.mapper.ApiItemMapper;
 import org.binggo.apiwatchdog.mapper.ApiStatDataMapper;
 import org.binggo.apiwatchdog.processor.analyzer.AnalyzerUtils;
 import org.binggo.apiwatchdog.common.CommonUtils;
 import org.binggo.apiwatchdog.common.ReturnCode;
+import org.binggo.apiwatchdog.common.WatchdogEnv;
 import org.binggo.apiwatchdog.common.WatchdogException;
 import org.binggo.apiwatchdog.domain.ApiItem;
 import org.binggo.apiwatchdog.domain.ApiStatData;
@@ -49,11 +51,13 @@ public class Statis {
 	private ApiItemMapper apiItemMapper;
 	
 	@Autowired
-	public Statis(ApiStatDataMapper apiStatDataMapper, StringRedisTemplate template) {
-		dataCache = CacheBuilder.newBuilder()
+	public Statis(ApiStatDataMapper apiStatDataMapper, StringRedisTemplate template, WatchdogEnv env) {
+		int keyExpireTime = env.getInteger(AnalyzerUtils.REDIS_KEYS_EXPIRE_CONFIG, AnalyzerUtils.REDIS_KEYS_EXPIRE_DEFAULT);
+		
+		this.dataCache = CacheBuilder.newBuilder()
 				.expireAfterAccess(StatisUtils.CACHE_EXPIRE_TIME, TimeUnit.MINUTES)
 				.build(
-					new StatisCacheLoader(apiStatDataMapper, template)
+					new StatisCacheLoader(apiStatDataMapper, template, keyExpireTime)
 				);
 	}
 	
@@ -547,45 +551,73 @@ public class Statis {
 	 */
 	private class StatisCacheLoader extends CacheLoader<String, ApiStatData> {
 		
+		private int keyExpireTime;
+		
 		private ApiStatDataMapper apiStatDataMapper;
 		
 		private StringRedisTemplate template;
 		
-		public StatisCacheLoader(ApiStatDataMapper apiStatDataMapper, StringRedisTemplate template) {
+		public StatisCacheLoader(ApiStatDataMapper apiStatDataMapper, StringRedisTemplate template, int keyExpireTime) {
+			this.keyExpireTime = keyExpireTime;
 			this.apiStatDataMapper = apiStatDataMapper;
 			this.template = template;
 		}
-
-		@Override
-		public ApiStatData load(String key) throws ExecutionException {
-			ApiStatData returnData = null;  // the data needed to be got from LoadingCache
+		
+		// load data from mysql, and return ApiStatData corresponding to startDate
+		private ApiStatData loadDataFromMysql(int apiId, Date startDate, Date endDate) {
+			ApiStatData startData = new ApiStatData();
+			startData.setApiId(apiId);
+			startData.setStartTime(endDate);
 			
-			// preparation work
-			String[] strArray = ((String)key).split("-");
-			int apiId = Integer.valueOf(strArray[0]);
-			Date thisDate = null, endDateForPreload = null;  // start date and end date for preloading
 			DateFormat compactFormat = CommonUtils.getCompactDateFormat();
-			try {
-				thisDate = compactFormat.parse(strArray[1]);
-			} catch (ParseException ex) {
-				// never happen
-			}
-			
-			// preload data from redis
-			long timeSliceNum = StatisUtils.CACHE_PRE_LOAD/AnalyzerUtils.TIME_SLICE_LENGTH;
-			for (long i = 0; i < timeSliceNum; i++) {
-				Date currentDate = new Date(thisDate.getTime() + i * AnalyzerUtils.TIME_SLICE_LENGTH);
-				String redisKeyName = String.format("%d-%s", apiId, compactFormat.format(currentDate));
-
-				Map<Object, Object> redisHash = template.boundHashOps(redisKeyName).entries();
-				if (redisHash == null || redisHash.isEmpty()) {
-					// the statistical data of the given API for the given date doesn't exist in Redis
-					continue;
-				}
+			long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
+			long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
+			for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
+				Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
+				String dataRedisKey = String.format("%d-%s", apiId, compactFormat.format(currentDate));
 				
 				ApiStatData apiStatData = new ApiStatData();
 				apiStatData.setApiId(apiId);
 				apiStatData.setStartTime(currentDate);
+				
+				dataCache.put(dataRedisKey, apiStatData);
+			}
+
+			List<ApiStatData> dataList = apiStatDataMapper.getDataByTime(apiId, startDate, endDate);
+			for (ApiStatData data : dataList) {
+				if (data.getStartTime().getTime() == startDate.getTime()) {
+					startData = data;
+				}
+				String dataRedisKey = String.format("%d-%s", data.getApiId(), compactFormat.format(data.getStartTime()));
+				dataCache.put(dataRedisKey, data);
+			}
+			
+			return startData;
+		}
+		
+		// load data from redis, and return ApiStatData corresponding to startDate
+		private ApiStatData loadDataFromRedis(int apiId, Date startDate, Date endDate) {
+			ApiStatData startData = new ApiStatData();
+			startData.setApiId(apiId);
+			startData.setStartTime(endDate);
+			
+			DateFormat compactFormat = CommonUtils.getCompactDateFormat();
+			long startTimeSliceIndex = startDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
+			long endTimeSliceIndex = endDate.getTime()/AnalyzerUtils.TIME_SLICE_LENGTH;
+			for (long i = startTimeSliceIndex; i < endTimeSliceIndex; i++) {
+				Date currentDate = new Date(i * AnalyzerUtils.TIME_SLICE_LENGTH);
+				
+				ApiStatData apiStatData = new ApiStatData();
+				apiStatData.setApiId(apiId);
+				apiStatData.setStartTime(currentDate);
+				
+				String redisKeyName = String.format("%d-%s", apiId, compactFormat.format(currentDate));
+				Map<Object, Object> redisHash = template.boundHashOps(redisKeyName).entries();
+				if (redisHash == null || redisHash.isEmpty()) {
+					// the statistical data of the given API for the given date doesn't exist in Redis
+					dataCache.put(redisKeyName, apiStatData);
+					continue;
+				}
 				
 				Map<String, Integer> statDataMap = Maps.newHashMap();
 				for (Map.Entry<Object, Object> entry : redisHash.entrySet()) {
@@ -599,36 +631,53 @@ public class Statis {
 					// nothing
 				}
 				
-				dataCache.put(redisKeyName, apiStatData);
-				if (i == 0) {
-					returnData = apiStatData;
+				if (i == startTimeSliceIndex) {
+					startData = apiStatData;
 				}
+				dataCache.put(redisKeyName, apiStatData);
 			}
-			if (returnData != null) {
-				return returnData;
+
+			return startData;
+		}
+
+		@Override
+		public ApiStatData load(String key) throws ExecutionException {
+			ApiStatData returnData = new ApiStatData();  // the data needed to be got from LoadingCache
+			
+			// preparation work
+			String[] strArray = ((String)key).split("-");
+			int apiId = Integer.valueOf(strArray[0]);
+			Date keyDate = null;
+			try {
+				keyDate = CommonUtils.getCompactDateFormat().parse(strArray[1]);
+			} catch (ParseException ex) {
+				// never happen
+				throw new ExecutionException(key + "'s format is invalid", new WatchdogException(ReturnCode.INVALID_DATE));
 			}
+			returnData.setApiId(apiId);
+			returnData.setStartTime(keyDate);
 			
-			// preload data from mysql
-			endDateForPreload = new Date(thisDate.getTime() + StatisUtils.CACHE_PRE_LOAD); // end date for preloading
-			List<ApiStatData> dataList = apiStatDataMapper.getDataByTime(apiId, thisDate, endDateForPreload);
+			Date preloadEndDate = new Date(keyDate.getTime() + StatisUtils.CACHE_PRE_LOAD);
+			Date now = new Date();
+			Date expireCriticalPoint = new Date(now.getTime() - keyExpireTime*60*1000);
 			
-			if (dataList.size() == 0 || dataList.get(0).getStartTime().getTime() != thisDate.getTime()) {
-				//logger.debug(String.format("statistical data [%s] not found in both redis and mysql", key));
-				// must not return null
-				throw new ExecutionException(key + " not found in both redis and mysql", 
-						new WatchdogException(ReturnCode.STAT_DATA_NOT_FOUND));
+			// case 1
+			if (preloadEndDate.getTime() < expireCriticalPoint.getTime()) {
+				return loadDataFromMysql(apiId, keyDate, preloadEndDate);
+			} else if (preloadEndDate.getTime() < now.getTime()) {
+				// case 2
+				if (keyDate.getTime() < expireCriticalPoint.getTime()) {
+					returnData = loadDataFromMysql(apiId, keyDate, expireCriticalPoint);
+					loadDataFromRedis(apiId, expireCriticalPoint, preloadEndDate);
+					return returnData;
+				} else {
+					// case 3
+					return loadDataFromRedis(apiId, keyDate, preloadEndDate);
+				}
+			} else {
+				// case 4
+				return loadDataFromRedis(apiId, keyDate, now);
 			}
-			returnData = dataList.get(0);
-			
-			for (ApiStatData data : dataList) {
-				String dataRedisKey = String.format("%d-%s", 
-						data.getApiId(), 
-						compactFormat.format(data.getStartTime())
-					);
-				dataCache.put(dataRedisKey, data);
-			}
-			
-			return returnData;
 		}
 	}
 
