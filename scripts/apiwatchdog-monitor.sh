@@ -1,7 +1,7 @@
 #!/bin/bash
 # ---------------------------------------------------------------------------
 # Description: monitor apiwatchdog's running status.
-#   add to crontab: Crontab: */1 * * * *  /your/path/apiwatchdog-monitor.sh
+#   add to crontab: Crontab: */1 * * * * bash /your/path/apiwatchdog-monitor.sh
 # ---------------------------------------------------------------------------
 
 # configuration of log file
@@ -17,7 +17,7 @@ function log() {
     local log_level=$1
     local log_msg=$2
     local date_str=$(date +"%Y-%m-%d %H:%M:%S")
-    echo "[$date_str] [$log_level] $log_msg" >> $SUPERVISOR_LOG_FILE
+    echo "[$date_str] [$log_level] $log_msg" >> $MONITOR_LOG_FILE
 }
 
 EXIST=$(ps aux | grep "apiwatchdog.jar" | grep -v grep | wc -l)
