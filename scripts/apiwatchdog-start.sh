@@ -4,7 +4,7 @@
 #	apiwatchdog service
 # -------------------------------------------------------------------------
 
-if [ $# -ne 1 ]; then
+if [ $# -lt 1 ]; then
 	echo "Usage: $0 local|pre-release|production"
 	exit 1
 fi
