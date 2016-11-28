@@ -38,13 +38,11 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/api/getCallNumTS")
 	public WatchdogResponse getApiCallNumTS(@RequestBody Map<String, String> params) {
-		logger.debug("receive a post request to /statis/api/getCallNumTS: {}", params);
 		try {
 			Integer apiId = Integer.valueOf(params.get("apiId"));
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Integer> statisData = statis.getApiCallNumTimeSeries(apiId, startTime, endTime);
-			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -60,13 +58,11 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/api/getAvailabilityTS")
 	public WatchdogResponse getApiAvailablityTS(@RequestBody Map<String, String> params) {
-		logger.debug("receive a post request to /statis/api/getAvailabilityTS: {}", params);
 		try {
 			Integer apiId = Integer.valueOf(params.get("apiId"));
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Double> statisData = statis.getApiAvailabilityTimeSeries(apiId, startTime, endTime);
-			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -82,13 +78,11 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/api/getAccuracyTS")
 	public WatchdogResponse getApiAccuracyTS(@RequestBody Map<String, String> params) {
-		logger.debug("receive a post request to /statis/api/getAccuracyTS: {}", params);
 		try {
 			Integer apiId = Integer.valueOf(params.get("apiId"));
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Double> statisData = statis.getApiAccuracyTimeSeries(apiId, startTime, endTime);
-			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -104,13 +98,11 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/api/getAvgResptimeTS")
 	public WatchdogResponse getApiAvgResptimeTS(@RequestBody Map<String, String> params) {
-		logger.debug("receive a post request to /statis/api/getAvgResptimeTS: {}", params);
 		try {
 			Integer apiId = Integer.valueOf(params.get("apiId"));
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Double> statisData = statis.getApiAvgResptimeTimeSeries(apiId, startTime, endTime);
-			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -126,13 +118,11 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/api/getResptimeDist")
 	public WatchdogResponse getApiResptimeDist(@RequestBody Map<String, String> params) {
-		logger.debug("receive a post request to /statis/api/getResptimeDist: {}", params);
 		try {
 			Integer apiId = Integer.valueOf(params.get("apiId"));
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Integer> statisData = statis.getApiResptimeDistribution(apiId, startTime, endTime);
-			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -150,13 +140,11 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/provider/getCallNumTS")
 	public WatchdogResponse getCallNumTS(@RequestBody Map<String, String> params) {
-		logger.debug("receive a post request to /statis/provider/getCallNumTS: {}", params);
 		try {
 			Integer providerId = Integer.valueOf(params.get("providerId"));
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Integer> statisData = statis.getCallNumTimeSeries(providerId, startTime, endTime);
-			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -172,13 +160,11 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/provider/getAvailabilityTS")
 	public WatchdogResponse getAvailabilityTS(@RequestBody Map<String, String> params) {
-		logger.debug("receive a post request to /statis/provider/getAvailabilityTS: {}", params);
 		try {
 			Integer providerId = Integer.valueOf(params.get("providerId"));
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Double> statisData = statis.getAvailabilityTimeSeries(providerId, startTime, endTime);
-			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -194,13 +180,11 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/provider/getAccuracyTS")
 	public WatchdogResponse getAccuracyTS(@RequestBody Map<String, String> params) {
-		logger.debug("receive a post request to /statis/provider/getAccuracyTS: {}", params);
 		try {
 			Integer providerId = Integer.valueOf(params.get("providerId"));
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Double> statisData = statis.getAccuracyTimeSeries(providerId, startTime, endTime);
-			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);	
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -216,13 +200,11 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/provider/getAvgResptimeTS")
 	public WatchdogResponse getAvgResptimeTS(@RequestBody Map<String, String> params) {
-		logger.debug("receive a post request to /statis/provider/getAvgResptimeTS: {}", params);
 		try {
 			Integer providerId = Integer.valueOf(params.get("providerId"));
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Double> statisData = statis.getAvgResptimeTimeSeries(providerId, startTime, endTime);
-			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -238,13 +220,11 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/provider/getResptimeDist")
 	public WatchdogResponse getResptimeDist(@RequestBody Map<String, String> params) {
-		logger.debug("receive a post request to /statis/provider/getResptimeDist: {}", params);
 		try {
 			Integer providerId = Integer.valueOf(params.get("providerId"));
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<String, Integer> statisData = statis.getResptimeDistribution(providerId, startTime, endTime);
-			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, statisData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -262,13 +242,11 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/ranklist/getApiAvailability")
 	public WatchdogResponse getApiRankListByAvailablity(@RequestBody Map<String, String> params) {
-		logger.debug("receive a post request to /statis/ranklist/getApiAvailability: {}", params);
 		try {
 			Integer providerId = Integer.valueOf(params.get("providerId"));
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<Integer, Double> rankListData = statis.getApiRankListByAvailablity(providerId, startTime, endTime);
-			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, rankListData);	
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -284,13 +262,11 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/ranklist/getApiAccuracy")
 	public WatchdogResponse getApiRankListByAccuracy(@RequestBody Map<String, String> params) {
-		logger.debug("receive a post request to /statis/ranklist/getApiAccuracy: {}", params);
 		try {
 			Integer providerId = Integer.valueOf(params.get("providerId"));
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<Integer, Double> rankListData = statis.getApiRankListByAccuracy(providerId, startTime, endTime);
-			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, rankListData);	
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
@@ -306,13 +282,11 @@ public class StatisController {
 	 */
 	@RequestMapping(method=RequestMethod.POST, value="/ranklist/getApiAvgResptime")
 	public WatchdogResponse getApiRankListByAvgResptime(@RequestBody Map<String, String> params) {
-		logger.debug("receive a post request to /statis/ranklist/getApiAvgResptime: {}", params);
 		try {
 			Integer providerId = Integer.valueOf(params.get("providerId"));
 			String startTime = params.get("startTime");
 			String endTime = params.get("endTime");
 			Map<Integer, Double> rankListData = statis.getApiRankListByAvgResptime(providerId, startTime, endTime);
-			logger.debug("time of sending the response: {}", CommonUtils.getDateFormat().format(new Date()));
 			return WatchdogResponse.getResponse(ReturnCode.OK, rankListData);
 		} catch (WatchdogException ex) {
 			logger.error(ex.getMessage());
