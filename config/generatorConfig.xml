@@ -25,7 +25,7 @@
       <property name="trimStrings" value="true" />
     </javaModelGenerator>
 
-    <sqlMapGenerator targetPackage="org.binggo.apiwatchdog.mapper"  targetProject="src/main/resources">
+    <sqlMapGenerator targetPackage="mybatis"  targetProject="src/main/resources">
       <property name="enableSubPackages" value="true" />
     </sqlMapGenerator>
     
