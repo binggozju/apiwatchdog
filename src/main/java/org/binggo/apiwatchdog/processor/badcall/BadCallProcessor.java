@@ -66,11 +66,11 @@ public class BadCallProcessor extends WatchdogProcessor {
 		}
 		
 		// An API call whose return code of API is not 0
-		if (apiCall.getApiReturnCode() == null) {
+		/*if (apiCall.getApiReturnCode() == null) {
 			return true;
 		} else if (!apiCall.getApiReturnCode().equals("0")) {
 			return true;
-		}
+		}*/
 		
 		return false;
 	}
