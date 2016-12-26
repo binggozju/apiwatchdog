@@ -24,7 +24,7 @@ public class WebRequestAspect {
 	
 	private static final Logger logger = LoggerFactory.getLogger(WebRequestAspect.class);
 	
-	private ThreadLocal<Long> startTime = new ThreadLocal<>();
+	private ThreadLocal<Long> startTime = new ThreadLocal<Long>();
 	
 	@Pointcut("execution(public * org.binggo.apiwatchdog.controller.StatisController.*(..))")
 	public void webRequest() {}
